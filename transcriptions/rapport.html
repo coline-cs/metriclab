@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meta Ads — Rapport</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;color:#1c1e21}
+header{background:linear-gradient(135deg,#1877f2,#0a58ca);color:#fff;padding:20px 32px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+header h1{font-size:1.3rem;font-weight:700}
+header small{opacity:.8;font-size:.82rem}
+.toolbar{background:#fff;border-bottom:1px solid #dde1e7;padding:12px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap input{width:100%;padding:9px 12px 9px 36px;border:1px solid #d0d5dd;border-radius:8px;font-size:.9rem;outline:none;transition:.2s}
+.search-wrap input:focus{border-color:#1877f2;box-shadow:0 0 0 3px rgba(24,119,242,.15)}
+.search-wrap::before{content:"🔍";position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.85rem}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{border:none;background:#f0f2f5;border-radius:20px;padding:6px 14px;font-size:.82rem;cursor:pointer;transition:.2s;font-weight:500;color:#444}
+.tab:hover{background:#dde1e7}
+.tab.active{background:var(--tab-color,#1877f2);color:#fff}
+.sort-select{padding:7px 10px;border:1px solid #d0d5dd;border-radius:8px;font-size:.82rem;background:#fff;cursor:pointer}
+main{max-width:1440px;margin:0 auto;padding:24px 16px}
+.stats{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.stat{background:#fff;border-radius:10px;padding:14px 20px;box-shadow:0 1px 4px rgba(0,0,0,.08);min-width:120px}
+.stat .n{font-size:1.8rem;font-weight:800;color:#1877f2}
+.stat .l{font-size:.78rem;color:#65676b;margin-top:2px}
+.kw-cloud{background:#fff;border-radius:10px;padding:16px 20px;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.kw-cloud h3{font-size:.85rem;color:#65676b;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.kw{cursor:pointer;padding:2px 4px;border-radius:4px;margin:2px;display:inline-block;color:#1877f2;font-weight:500;transition:.15s}
+.kw:hover,.kw.active{background:#1877f2;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.card{background:#fff;border-radius:10px;border-left:4px solid #adb5bd;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);transition:.2s;display:flex;flex-direction:column;gap:10px}
+.card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);transform:translateY(-1px)}
+.card.hidden{display:none}
+.card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{border-radius:4px;padding:3px 8px;font-size:.72rem;font-weight:700;white-space:nowrap}
+.pos{font-size:.78rem;color:#65676b;font-weight:600}
+.meta-link{margin-left:auto;font-size:.78rem;color:#1877f2;text-decoration:none;padding:3px 8px;border:1px solid #1877f2;border-radius:4px;white-space:nowrap;transition:.15s}
+.meta-link:hover{background:#1877f2;color:#fff}
+.meta-link.disabled{color:#adb5bd;border-color:#adb5bd;pointer-events:none}
+.page-name{font-size:.8rem;color:#444;font-weight:600}
+.reach-badge{display:inline-block;font-size:.78rem;font-weight:700;color:#0d6e4f;background:#e6f7f0;border-radius:4px;padding:3px 8px;margin:4px 0}
+.ad-body{font-size:.78rem;color:#65676b;font-style:italic;border-left:3px solid #e4e6ea;padding-left:8px;line-height:1.4}
+.visual-info{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.vtag{background:#eef4ff;color:#1877f2;border-radius:4px;padding:2px 7px;font-size:.7rem;font-weight:600}
+.vtag.style{background:#f0fff4;color:#2d7a47}
+.vtag.text{background:#fff8e6;color:#7a5a00}
+.transcript-preview{font-size:.87rem;line-height:1.55;color:#1c1e21}
+.card-footer{display:flex;align-items:center;gap:8px;margin-top:4px}
+.lang-badge{font-size:.75rem;background:#f0f2f5;padding:2px 7px;border-radius:10px;color:#444}
+.word-count{font-size:.75rem;color:#65676b}
+.copy-btn{margin-left:auto;background:none;border:1px solid #dde1e7;border-radius:6px;padding:4px 10px;font-size:.75rem;cursor:pointer;color:#444;transition:.15s}
+.copy-btn:hover{background:#1877f2;color:#fff;border-color:#1877f2}
+.copy-btn.copied{background:#28a745;color:#fff;border-color:#28a745}
+.adapt-btn{background:#1877f2;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:.8rem;cursor:pointer;font-weight:600;transition:.15s;width:100%;margin-top:6px;text-align:center}
+.adapt-btn:hover{background:#0a58ca}
+.score-badge{border-radius:4px;padding:3px 8px;font-size:.78rem;font-weight:700;white-space:nowrap;cursor:default}
+.score-g{background:#d4edda;color:#155724}
+.score-o{background:#fff3cd;color:#856404}
+.score-r{background:#f8d7da;color:#721c24}
+.score-detail{font-size:.72rem;color:#65676b;margin-top:4px}
+details{margin-top:4px}
+summary{font-size:.78rem;color:#1877f2;cursor:pointer;user-select:none}
+pre{font-size:.82rem;line-height:1.6;white-space:pre-wrap;background:#f8f9fa;padding:10px;border-radius:6px;margin-top:6px;max-height:200px;overflow-y:auto}
+.empty-state{text-align:center;padding:60px;color:#65676b;font-size:1rem}
+mark{background:#fff3cd;border-radius:2px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.stats{gap:8px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>📊 Meta Ads — Rapport de transcription</h1>
+  <small>Généré le 11/06/2026 10:12</small>
+</header>
+
+<div class="toolbar">
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Rechercher dans les transcriptions..." oninput="applyFilters()">
+  </div>
+  <div class="tabs" id="tabs"><button class="tab active" onclick="filterLabel('all')">Toutes (6)</button><button class="tab" onclick="filterLabel('Top Performers')" style="--tab-color:#f0ad4e">🏆 Top Performers (6)</button></div>
+  <select class="sort-select" id="sort" onchange="applyFilters()">
+    <option value="position">Trier par position</option>
+    <option value="reach_desc">📡 Plus grosse couverture UE en premier</option>
+    <option value="score_desc">⭐ Meilleur score en premier</option>
+    <option value="score_asc">Score le plus bas en premier</option>
+    <option value="words_desc">Plus de mots en premier</option>
+    <option value="words_asc">Moins de mots en premier</option>
+  </select>
+</div>
+
+<main>
+  <div class="stats" id="stats-bar"></div>
+
+  <div class="kw-cloud">
+    <h3>Mots-clés fréquents — cliquer pour filtrer</h3>
+    <div><span class="kw" style="font-size:1.60rem;opacity:1.00" data-kw="pour" onclick="filterByKw(this)">pour</span> <span class="kw" style="font-size:1.60rem;opacity:1.00" data-kw="sucre" onclick="filterByKw(this)">sucre</span> <span class="kw" style="font-size:1.60rem;opacity:1.00" data-kw="sans" onclick="filterByKw(this)">sans</span> <span class="kw" style="font-size:1.53rem;opacity:1.00" data-kw="bonjour" onclick="filterByKw(this)">bonjour</span> <span class="kw" style="font-size:1.47rem;opacity:1.00" data-kw="insuline" onclick="filterByKw(this)">insuline</span> <span class="kw" style="font-size:1.47rem;opacity:1.00" data-kw="forcément" onclick="filterByKw(this)">forcément</span> <span class="kw" style="font-size:1.47rem;opacity:1.00" data-kw="tasse" onclick="filterByKw(this)">tasse</span> <span class="kw" style="font-size:1.40rem;opacity:0.95" data-kw="fait" onclick="filterByKw(this)">fait</span> <span class="kw" style="font-size:1.40rem;opacity:0.95" data-kw="grâce" onclick="filterByKw(this)">grâce</span> <span class="kw" style="font-size:1.40rem;opacity:0.95" data-kw="vrai" onclick="filterByKw(this)">vrai</span> <span class="kw" style="font-size:1.40rem;opacity:0.95" data-kw="prendre" onclick="filterByKw(this)">prendre</span> <span class="kw" style="font-size:1.40rem;opacity:0.95" data-kw="franchement" onclick="filterByKw(this)">franchement</span> <span class="kw" style="font-size:1.40rem;opacity:0.95" data-kw="moment" onclick="filterByKw(this)">moment</span> <span class="kw" style="font-size:1.33rem;opacity:0.90" data-kw="coup" onclick="filterByKw(this)">coup</span> <span class="kw" style="font-size:1.33rem;opacity:0.90" data-kw="café" onclick="filterByKw(this)">café</span> <span class="kw" style="font-size:1.33rem;opacity:0.90" data-kw="peut" onclick="filterByKw(this)">peut</span> <span class="kw" style="font-size:1.33rem;opacity:0.90" data-kw="être" onclick="filterByKw(this)">être</span> <span class="kw" style="font-size:1.33rem;opacity:0.90" data-kw="vient" onclick="filterByKw(this)">vient</span> <span class="kw" style="font-size:1.27rem;opacity:0.85" data-kw="entre" onclick="filterByKw(this)">entre</span> <span class="kw" style="font-size:1.27rem;opacity:0.85" data-kw="problème" onclick="filterByKw(this)">problème</span></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty-state hidden" id="empty">Aucune transcription ne correspond à ta recherche.</div>
+</main>
+
+<script>
+const DATA = [{"label": "Top Performers", "position": 68, "lang": "fr", "transcript": "Les fringales, le coup de bar de 14h, l'inflammation silencieuse, tout ça tu penses que ce sont des problèmes séparés alors qu'en fait c'est ton pancreac qui t'envoie des signeaux d'alarme mais ça personne n'en parle. C'est lui qui décide si tu brûles ou si tu stockes. À chafoque tu manges, une libère de l'insuline pour permettre au sucre d'entrer dans tes cellules et de produire de l'énergie. Quand tu grignottes un truc sucré entre les repas, tu forts ton pancreas à produire de l'insuline en urgence. Encore et encore et à force, tes cellules n'écoutent plus, c'est la résistance à l'insuline. Et là, c'est l'effet d'ominion, fatigue permanente, fringale incontrolable, gréceuse d'ominale, inflammation silencieuse, ton corps réclame du sucre pour compenser une fatigue elle-même causée par le sucre. La bonne nouvelle, c'est que tu peux protéger ton pancreas naturellement. Grâce au cacao, le vrai, tu satisfait ton envis de sucrer sans un seul grame de sucre ajouté. Grâce au corde d'iceps, tu améliore l'oxygénation des cellules et grâce à ça, tu retrouves une énergie stable, sans pique, sans crache. Grâce à la mauve, tu appestez paroi un intestinal et tu calmes les inconforts digestifs causés par l'inflammation silencieuse. Et grâce au jinxeng, utilisé depuis 4 000 ans et tu dis pour ces effets sur la vitalité, tu tiens tout à journée sans coup de bar. Le problème, c'est que si tu veux prendre ces compléments séparément, tu te retrouves vite à dépenser jusqu'à 10 euros par jour et en plus on va baisse mon tœur quand tu dois prendre une montagne de gil le matin. Elle finit souvent au fond du placard. C'est pour ça qu'on a créé, bonjour, un rituel qui contient ces 4 compléments en plus du lion's mane pour la clarté mentale et du chagab pour la digestion. En plus de ça, on a 7 recettes, café, cacao et même roi-boss chai, donc on a forcément une qui va te faire. Tout ça pour seulement 1 euro la tasse qui contient 2700 mg de princip active, qui fait de bonjour l'une des concentrations les plus élevé du marché. Donc franchement, t'as plus aucune raison de baisser y'a à part peut-être le prix et c'est pour ça que je dirais bon qu'en ce moment on a jusqu'à moins 50.000 % sur notre site. On a toujours les seçons de jour cetisfeur remboursé et si t'as pas envie de commander sur internet, ce que je comprends, je peux être approché d'une de notre 3300 pharmacie partenaire de la ForcéMorne juste en bâchette.", "url": "https://video-cdg4-2.xx.fbcdn.net/o1/v/t2/f2/m412/AQMOeJTlFOSBFj1gYORiOAzt6-iUkR7n0zM9D-ZY9W8yLoSAlA8qR7Q-kxRBX4jNYho_XD9nYnq5x58V2-e2eTPG2jO4uAo56pdmbh1hkA.mp4?_nc_cat=109&_nc_sid=8bf8fe&_nc_ht=video-cdg4-2.xx.fbcdn.net&_nc_ohc=pcnAcSTtA1cQ7kNvwFr6VMe&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5WSV9VU0VDQVNFX1BST0RVQ1RfVFlQRS4uQzMuMzYwLnN2ZV9zZCIsInhwdl9hc3NldF9pZCI6MzAxMzE4MjU0MjQwNjQzMywiYXNzZXRfYWdlX2RheXMiOjQ4LCJ2aV91c2VjYXNlX2lkIjoxMDEzOSwiZHVyYXRpb25fcyI6MTE5LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&_nc_gid=uYbvmXOv4PV_5BXec65oDg&_nc_ss=7b289&_nc_zt=28&oh=00_Af8tNRGTiCYlpjbxWs55unptAj346ESLB_xBCxViLqaI8Q&oe=6A2F38D9", "ad_id": null, "page_name": null, "ad_body": null, "eu_reach": null, "start_date": null, "visual_analysis": {}, "scoring": {}}, {"label": "Top Performers", "position": 69, "lang": "fr", "transcript": "Leurie, c'est du sucre. Les pattes, c'est du sucre. Le pain, ça du sucre, on voit passer ça partout en ce moment, mais c'est faux et le sexy pour quoi. C'est pas du sucre, mais des amis donc. Mais c'est vrai qu'en ce moment, on a l'impression qu'on ne peut plus rien manger. Alors que je te rassure, on peut continuer à manger tout ça. Par contre, faut juste manger, puis des fibres. Elles ont trois fonctions ultra importantes. Un, elles couptent afin. Du coup, tu grignotement. Deux, elles ralentissent l'absorption du sucre dans ton sang. Et trois, elles évident les pignes d'insuline. Et donc, la résistance à cette dernière. Et quand on insuline, elle reste stable. Ton corps, il brûle, au lieu de stocker. Le problème, c'est qu'en France, t'as que 13% des adultes qui atteignent la porte de fibres minimum recommandait. Pourquoi parce qu'on mange trop de produits transformés, pas assez de légumineuses et trop de sucre raffinées ? Du coup, ton corps, il est en pigne d'insuline en permanence sans même que petit temps en compte. Et ça, ça produce qu'on appelle la résistance à l'insuline. Et derrière, c'est les faits de mineux. Fringale, fatigue chronique, récable de minelle, tout par de là. Mais la bonne nouvelle, c'est que si tu fais partie des 87% des Français en manque de fibres. Comme moi, tu peux soutenir ton organisme naturellement avec ces trois compléments. La mauvaise, elle va venir apporter des fibres solules. Et du coup, ralentir la absorption de sucre dans ton sens, ce qui va améliorer la digestion. Le chagac et le champignon, le plus anti-oxinant la planète, il va t'apporter des fibres prébiotiques. Et du coup, nourrir les bonnes bactéries de ton microbiote. Le zigzag, il est épisé depuis plus de 4 000 ans. Et il va venir réduire ton cortisol. C'est lui qui pousse à agrignoter. Le problème, c'est que si tu veux prendre tous ces compléments séparément, ça te revient très vite hyper cher. Entre 4 et 5 euros par jour. Et en plus de ça, c'est toute une organisation. Ça te revient vite à 10 à très jelou, à prendre tous les matins à gins. Donc forcément, à la plupart du temps, ton humilien moitié au fond du placard. Et donc au final, tu arrêtes complètement et à la fin, tu culpabilises. Donc c'est exactement pour ça qu'on a créé... Bonjour, c'est le ritual qui contient tous ces compléments avec en plus du l'anxmen pour la clartémentale et du cornicez pour avoir une énergisteable, sans pique et sans crache. Tout ça, pour seulement un heure la tasse, qui contient 2,700 mg de princip actifs par portion, ce qui en fait la concentration de la plus élevé du marché. Mais le plus important, ça reste le goût. C'est pour ça qu'on a créé 7 savers différentes. Donc entre la recette originale, la saverque à chaos, ou le goût, roi boss checker sont plus hotés, il y a forcément une recette que tu vas adorer. Donc franchement, tu n'as plus aucune raison de pas vouloir essayer. Sauf peut-être le prix, c'est vrai, mais c'est pour ça qu'en ce moment, on te propose jusqu'à moins 55% sur tout le site internet. Et si tu as peur d'acheter un link, ce que je peux comprendre, il suffit que tu trouves l'une des 3 500 pharmacies partenaires avec mon jour. Il y en a forcément une qui est juste à côté de chez toi.", "url": "https://video-cdg6-1.xx.fbcdn.net/o1/v/t2/f2/m412/AQPBtm6h8jcVJdMx4Dfhlta_xnWDuxzmhzxg0ee_nUIJ39HxK6q_iZFkyY2SYqIRHhK42Q4M-cbYh88IPvi9RamBKIDgAlQ-s5waFMWrfQ.mp4?_nc_cat=106&_nc_sid=8bf8fe&_nc_ht=video-cdg6-1.xx.fbcdn.net&_nc_ohc=xXakzoP3i1YQ7kNvwFssMpi&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5WSV9VU0VDQVNFX1BST0RVQ1RfVFlQRS4uQzMuMzYwLnN2ZV9zZCIsInhwdl9hc3NldF9pZCI6OTg1OTU2NjI0MTc3NDU5LCJhc3NldF9hZ2VfZGF5cyI6NCwidmlfdXNlY2FzZV9pZCI6MTAxMzksImR1cmF0aW9uX3MiOjEyNiwidXJsZ2VuX3NvdXJjZSI6Ind3dyJ9&ccb=17-1&_nc_gid=lh54vCPDA6vSzeJ85KFxNA&_nc_ss=7b289&_nc_zt=28&oh=00_Af9hMaJ3iSCYxrPmbRtzWYLFnDqv9CgdwQaUJdZtQfmwyg&oe=6A2F53FC", "ad_id": null, "page_name": null, "ad_body": null, "eu_reach": null, "start_date": null, "visual_analysis": {}, "scoring": {}}, {"label": "Top Performers", "position": 70, "lang": "fr", "transcript": "Le problème c'était pas mon estomac, c'est ce que je m'étais dedans. Et là je me suis dit ok, il faut vraiment que je trouvais une alternative. Je te raconte, j'étais à 5 a fait par jour. Et chaque matin, c'était le même scenario. Je me faisais mon premier café au réveil et hyper rapidement, j'avais les premières brûlées de stommac arrive. Et en soi, c'était presque devenu normal, une sorte d'habitude. Et là, il y a Juliette qui m'a reparlé de ses fameux champignons, Lion's Man, Chagat et Cordy Seps. Et franchement, au début, j'étais hyper sceptique. Mais bon, j'étais stée, j'ai joué le jeu, et en vrai, j'ai tout de suite ressenti les effets. J'avais vraiment une amélioration de ma digestion. Le problème de ça, c'est que les champignons tout seul, en vrai, c'est pas bon. C'est un butère, c'est vraiment pas un plaisir à boire. Du coup, on a rajouté de l'orgeté réfié et du cacao. Résultat championnion, plus horsgeté réfié, plus cacao, en fait, ça a donné la recepe de bonjour. Une recette 100% naturelle, sans additif, sans sucre ajouté. Vegan, bio et bien surfein en France. Au final, aujourd'hui, c'est devenu vraiment mon quotidien. D'ailleurs, c'est pas moi qui en parle le mieux. Une personne notamment, je me souviens qui nous a écrit et qui m'a dit, j'avais oublié ce que ça faisait de ne plus avoir mal au ventre du matin. En fait, c'était le café qui me délai mal au ventre. Et c'est vrai que quand cette personne n'a écrit ça, je me suis dit, ben oui, c'est exactement ce qu'on va faire comprendre aux gens. Donc, c'est aussi t'as envie de tester, en fait, arrête de m'écouter, et j'ai juste dit, bah sur le site, parce que t'as toujours 60 jours satisfaits remorcer. Donc franchement, il n'y a aucune raison de ne pas essayer.", "url": "https://video-cdg4-1.xx.fbcdn.net/o1/v/t2/f2/m412/AQN9LdbkCMbL1loF6tTFbMdTNK73va1yyxCBtPzNviKpuAMyVKAF-ZETjO0HsiWyxf7jY6JKcfhJzA_Njghk0z3fQsfQ_O5P55P801rpeg.mp4?_nc_cat=102&_nc_sid=8bf8fe&_nc_ht=video-cdg4-1.xx.fbcdn.net&_nc_ohc=GPIkdXwp7t8Q7kNvwFETWa7&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5WSV9VU0VDQVNFX1BST0RVQ1RfVFlQRS4uQzMuMzYwLnN2ZV9zZCIsInhwdl9hc3NldF9pZCI6MTQxMTM4MjI5MzQ4NzIzMCwiYXNzZXRfYWdlX2RheXMiOjkyLCJ2aV91c2VjYXNlX2lkIjoxMDEzOSwiZHVyYXRpb25fcyI6NzIsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&_nc_gid=lh54vCPDA6vSzeJ85KFxNA&_nc_ss=7b289&_nc_zt=28&oh=00_Af-udESM87dNdP3OeuTG5fPJSGV9EO-tqONbRf_yE_ZfqA&oe=6A2F40C0", "ad_id": null, "page_name": null, "ad_body": null, "eu_reach": null, "start_date": null, "visual_analysis": {}, "scoring": {}}, {"label": "Top Performers", "position": 71, "lang": "fr", "transcript": "... Franchement c'est complètement faux, si tu craques sur du sucre tous les jours, c'est pas du tout une question de volonté et j'ai été expliqué pourquoi. Tu vois ce moment à 16h, t'es au bureau ou tes chétois, t'as pas vraiment faim, t'es pas vraiment fatigué mais t'as quand même envie de grignoter. C'est pas toi qui est faible, c'est ton système nerveux qui cherche du sucre pour calmer cette tension qui s'est accumulée toute la journée. Donc ça peut être une réunion qui t'a énervé, le mail auquel t'as pas envie de répondre, les enfants tu vas chercher dans du nord. Mais là où ça devient un cercle vicieux, c'est que dès que tu mange un truc sucré, ton pancreas envoie de l'insuline en nuageance. L'insuline c'est quoi ? C'est ce qui permet à tes cellules d'absorber le sucre. Mais le problème c'est que plus tu grignote, plus tes cellules deviennent résistantes, c'est ce qu'on appelle la résistance à l'insuline. Deux heures plus tard, le tôt de sucre, dans ton sang, s'effondre. Et là, tu repondes dans une fringale encore plus forte. Et c'est pour ça que c'est pas du tout une question de volonté. Dans ton quotidien, tu auras forcément un coup de stress, une urgence agérée, un imprévu. Et donc forcément, tu retourneras vers le sucre, et c'est là que tu relances la machine. Donc la vraie solution, c'est de régler le problème à la source avec ces trois complément. Grâce au cocoa, tu satisfaites ton envie de sucrer sans insulgramme de sucre ajouté. Donc tu casse le pique de glycénique qui crée ta prochaine fringale. Grâce au zig-zag, utilisé depuis 4000 ans, tu réduis le pique de cortisol qui te fouss à grignoter qu'on a pressionnante. Et enfin, grâce au corps d'y-cep, tu retrouves une énergistable, sans pique n'écrache. Donc ton corps n'a plus besoin de sucre pour compenser. Sauf que quand tu veux prendre ces complément séparément, on déjà s'accoute hyper cher entre 5 et 10 euros par jour. Et surtout, il faut les prendre à j'in, le matin, à heure fixe, c'est tout une organisation. Et en général, ça finit au fond du placard. Et donc si tu as rien sous la main à ce moment-là, tu as de grande chance de tourner vers le sucre. Et c'est pour ça qu'on a créé bonjour. Ce rituel qui contient ces trois complément en plus du chagat pour la digestion et de la mauve pour appaiser tes mucudes. Bonjour, c'est pas qu'un complément. C'est aussi un rituel chaud et gourmand, sans un seul graime de sucre ajouté. Ce qui en fait la concentration n'a plus élevé du marché. Mais le plus important, ça reste le goût pour que tu puisses remplacer ton snac sucre. C'est pour ça qu'on a créé cette saveur entre la saveur originale, caca au café, au roi, boss chai pour ceux qui préfèrent leter. Je trouvera forcément ton bonheur. Donc franchement, t'as plus aucune raison de pas vouloir essayer sur ce peut-être le prix. Et c'est pour ça que je te réponds qu'en ce moment, on a jusqu'à moins 55% sur tout le site. Toujours la garantie, 60% de gens, 70% aux remboursés. Et si t'as pas envie de commander en ligne, ce que je comprends, tu peux te rendre dans une de nos trois mille, trois cent pharmacie par tennaire que t'as forcément eu en bas de chez toi.", "url": "https://video-cdg6-1.xx.fbcdn.net/o1/v/t2/f2/m412/AQPL_dmVflq2J34VTQQUhsSxStACL8661EXRVEOvNUj1zq3LX3g5ud1i0l3lBLQBK8i3vIhXzpqY9RNWIClQGaVlu0CijEdRR6y3O3brOg.mp4?_nc_cat=103&_nc_sid=8bf8fe&_nc_ht=video-cdg6-1.xx.fbcdn.net&_nc_ohc=Gy4N9VMDcToQ7kNvwFICMTg&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5WSV9VU0VDQVNFX1BST0RVQ1RfVFlQRS4uQzMuMzYwLnN2ZV9zZCIsInhwdl9hc3NldF9pZCI6MTQ5ODU0OTYyMTY3MDU2OCwiYXNzZXRfYWdlX2RheXMiOjE5LCJ2aV91c2VjYXNlX2lkIjoxMDEzOSwiZHVyYXRpb25fcyI6MTM5LCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&_nc_gid=lh54vCPDA6vSzeJ85KFxNA&_nc_ss=7b289&_nc_zt=28&oh=00_Af_ysiUfrAKQQDTLfxtP0AAuMUDaIg94m2kUn9qAKsp0pw&oe=6A2F461B", "ad_id": null, "page_name": null, "ad_body": null, "eu_reach": null, "start_date": null, "visual_analysis": {}, "scoring": {}}, {"label": "Top Performers", "position": 72, "lang": "fr", "transcript": "Pour la saveur original moca, on part sur une base d'orges qui vient d'Italie, de Kakao qui vient de République de Miniken, le Lion's Man qui vient principalement de France, Cordyceps qui vient d'Asie et pourquoi ? Parce que c'est là-bas qu'on produit le meilleur Cordyceps grâce à des conditions météorologiques qui sont optimales. Le Chaga qui vient de Finlande, la mauve qui vient de France et d'Italie, et pour finir le Jing Zeng qui vient lui aussi d'Asie comme le Cordyceps pour les mêmes raisons. L'extraction, le mélange et l'empactage sont réalisé dans les pays de la loi pour une qualité et une traceabilité parfaite. Tout ça pour un euro latasse. La providence des champignons c'est très important, mais le vrai point c'est l'extraction. Je t'explique. C'est comme pour un jeu d'orange. Tu peux avoir la meilleure orange du monde, mais si elle est pressée, n'importe comment, au final tu récupères pas le bon jus et t'as pas les bonnes vitamins. Mais pour les champignons, c'est pareil, c'est l'extraction qui est plus important. C'est pour ça que nous, on a décidé de faire ça en France dans les pays de la loi, dans un laboratoire spécialisé là dedans depuis plus de 20 ans. Ce qui nous permet d'avoir des extraits d'une qualité parfaite et surtout une traceabilité totale. Et tout ça pour obtenir 2700mg de princip active par tasse pour seulement 1 euro. Donc franchement, t'as plus aucune raison de ne pas vouloir essayer. À part peut-être le prix, mais c'est pour ça qu'en ce moment, on propose jusqu'à moins un 55% sur tout le site internet. Et si t'aimes pas acheter en ligne, c'est hyper facile et suffit que tu troues l'une des 3300 pharmacies qui est partenaire de bonjour et je suis sûr qu'il y en a forcément une à côté de chez toi.", "url": "https://video-cdg4-3.xx.fbcdn.net/o1/v/t2/f2/m412/AQMqX34byVJRMq-j0ZgieSh9FlzWQU9u1UDpt2nVBzfzkJpTTazZB7NY8_9LyOnYEsCmu0UfSSijeagTki5LR1rMC8w9_5zJPTjVEKwX7g.mp4?_nc_cat=111&_nc_sid=8bf8fe&_nc_ht=video-cdg4-3.xx.fbcdn.net&_nc_ohc=eMXLk6UqJ6sQ7kNvwFrJfIZ&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5WSV9VU0VDQVNFX1BST0RVQ1RfVFlQRS4uQzMuMzYwLnN2ZV9zZCIsInhwdl9hc3NldF9pZCI6MTYzMjEzNzA2MTMzODM1MiwiYXNzZXRfYWdlX2RheXMiOjU0LCJ2aV91c2VjYXNlX2lkIjoxMDEzOSwiZHVyYXRpb25fcyI6NzgsInVybGdlbl9zb3VyY2UiOiJ3d3cifQ%3D%3D&ccb=17-1&_nc_gid=lh54vCPDA6vSzeJ85KFxNA&_nc_ss=7b289&_nc_zt=28&oh=00_Af9GkEhfdfNmvbNFyAZiDS-67M2PzBMbuRVblscd2rhy7w&oe=6A2F254B", "ad_id": null, "page_name": null, "ad_body": null, "eu_reach": null, "start_date": null, "visual_analysis": {}, "scoring": {}}, {"label": "Top Performers", "position": 73, "lang": "fr", "transcript": "Et là on a Mathieu qui nous dit, franchement c'est hyper bon, mais ça reste cher. Bon déjà Mathieu, merci beaucoup d'avoir testé, et on va très bonnes sur la question du prix. On me dit souvent que bonjour, c'est plus cher qu'une tasse de café. Alors oui, il y en va pas se mentir, à un euro la tasse, bonjour, ça te revient un peu plus cher que ton café du matin. Sauf que bonjour, c'est pas juste une tasse de café. C'est une tasse qui contient cinq complément alimentaires. Devant être la mauve contre les ballonnements, du chagat, contre l'incontfort digestif, du cordiceps, contre les coups de barre et la fatigue, du l'anice-maine pour éviter le brouillard mental le matin notamment et rester focuss toute la journée. Et enfin le jinxeng qui agit contre le stress et la pot terme. Et évidemment, tu pourras prendre tout ça séparément. Le truc, c'est que ça te revient très vite entre cinq et dix euros par jour si tu prends tous ces compléments séparément. Et en plus de ça on va pas se mentir, c'est toute une organisation et en général ton oubli de la moitié au fond de ton placard. Devant, t'as 2700 mg de princip active par tasse, ce qui en fait la concentration la plus élevée du marché. C'est formulé dans les pays de la loi, dans un laboratoire indépendant expert en extraction naturelle. On est régulièrement contrôlé par un laboratoire indépendant que ça s'appelle Fito-Control, qui vient régulièrement contrôler la qualité, la concentration des ingrédients et surtout l'absence de contaminants comme par exemple les métallours. Donc finalement, à un heure la tasse, certes on est un peu plus cher qu'un café. Mais au final on est la meilleure option pour avoir ces cinq compléments dans une seule tasse. Mais finalement le prix, c'est vrai que c'est un sujet mais au final le plus important ça reste le goût pour prendre plaisir et le prendre régulièrement. Et donc c'est pour ça qu'on a créé sept savers différentes. Donc entre la recette originale, le goût Kakao ou la recette Roy Boss Chai qui se rapproche un peu plus du thé. Il y a forcément une recette que tu vas adoré, je suis sûr. Donc franchement, t'as plus aucune raison de pas vouloir essayer. Sauf peut-être le prix, c'est vrai. Mais en ce moment on ne propose jusqu'à moins 55% sur tout le site internet. Et si t'as pas envie d'acheter un link, il suffit que tu troubes l'une des 3.300 pharmaciques partenaires et bonjour. Et je suis sûr qu'il y en a une juste à côté de chez toi.", "url": "https://video-cdg4-2.xx.fbcdn.net/o1/v/t2/f2/m412/AQNtKLPCkzQiQLLnn2ygc08b3JyyEYUOFOOaz_a9b9BuDXHCrA-XTtX2e5TOV0MYKHcnHgYgQBPnNoXttjQnDqs6Goe-kxIpLehAWeFVRw.mp4?_nc_cat=109&_nc_sid=8bf8fe&_nc_ht=video-cdg4-2.xx.fbcdn.net&_nc_ohc=TNoJFvJPtCEQ7kNvwFYyok3&efg=eyJ2ZW5jb2RlX3RhZyI6Inhwdl9wcm9ncmVzc2l2ZS5WSV9VU0VDQVNFX1BST0RVQ1RfVFlQRS4uQzMuMzYwLnN2ZV9zZCIsInhwdl9hc3NldF9pZCI6MTQ5MTc3MjE4NTcyMjkwNywiYXNzZXRfYWdlX2RheXMiOjQwLCJ2aV91c2VjYXNlX2lkIjoxMDEzOSwiZHVyYXRpb25fcyI6MTAxLCJ1cmxnZW5fc291cmNlIjoid3d3In0%3D&ccb=17-1&_nc_gid=lh54vCPDA6vSzeJ85KFxNA&_nc_ss=7b289&_nc_zt=28&oh=00_Af-J_EnNdeqnR0AeW0qAXuBtKJuM80tktmsmINZ6ovpa4w&oe=6A2F40F1", "ad_id": null, "page_name": null, "ad_body": null, "eu_reach": null, "start_date": null, "visual_analysis": {}, "scoring": {}}];
+const LABEL_CFG = {
+  "Top Performers": {bg:"#fff8e6",border:"#f0ad4e",badge_bg:"#f0ad4e",badge_fg:"#5a3e00",icon:"🏆"},
+  "Nouvelles Créas": {bg:"#e8f7fb",border:"#17a2b8",badge_bg:"#17a2b8",badge_fg:"#fff",icon:"🆕"},
+};
+const DEFAULT_CFG = {bg:"#f8f9fa",border:"#adb5bd",badge_bg:"#6c757d",badge_fg:"#fff",icon:"📌"};
+
+let currentLabel = "all";
+let currentKw = null;
+
+function cfg(label){ return LABEL_CFG[label] || DEFAULT_CFG; }
+function wordCount(t){ return t.trim().split(/\s+/).length; }
+
+function highlight(text, query){
+  if(!query) return text;
+  const re = new RegExp("(" + query.replace(/[.*+?^${}()|[\]\\]/g,"\\$&") + ")", "gi");
+  return text.replace(re, "<mark>$1</mark>");
+}
+
+function buildVisualInfo(va){
+  if(!va || !Object.keys(va).length) return "";
+  let tags = "";
+  if(va.scene_type) tags += `<span class="vtag">📷 ${va.scene_type}</span>`;
+  if(va.visual_style) tags += `<span class="vtag style">🎨 ${va.visual_style}</span>`;
+  if(va.hook_visual) tags += `<span class="vtag">👁 ${va.hook_visual.substring(0,60)}</span>`;
+  if(va.text_overlays && va.text_overlays.length)
+    tags += `<span class="vtag text">💬 ${va.text_overlays.slice(0,2).join(" · ")}</span>`;
+  return tags ? `<div class="visual-info">${tags}</div>` : "";
+}
+
+function buildScoreBadge(sc) {
+  if(!sc || sc.score_total == null) return "";
+  const t = sc.score_total;
+  const cls = t >= 8 ? "score-g" : t >= 5 ? "score-o" : "score-r";
+  const tip = [
+    sc.score_generic  != null ? `Générique: ${sc.score_generic}/10` : "",
+    sc.score_product  != null ? `Produit: ${sc.score_product}/10` : "",
+    sc.verdict ? `"${sc.verdict}"` : "",
+    sc.top_words && sc.top_words.length ? `Mots clés: ${sc.top_words.join(", ")}` : ""
+  ].filter(Boolean).join(" · ");
+  const critera = sc.hook_strength != null
+    ? `<span class="score-detail">Hook ${sc.hook_strength} · Clarté ${sc.educational_clarity} · Mots ${sc.words_quality} · Structure ${sc.narrative_structure}</span>`
+    : "";
+  return `<span class="score-badge ${cls}" title="${tip}">${t.toFixed ? t.toFixed(1) : t} ⭐</span>${critera}`;
+}
+
+function adaptScript(idx) {
+  try {
+    var url = new URL(window.top.location.href);
+    url.searchParams.set('adapt_idx', String(idx));
+    window.top.location.href = url.toString();
+  } catch(e) {
+    console.warn('Navigation parent impossible:', e);
+  }
+}
+
+function fmtReach(n){
+  if(n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + ' M';
+  if(n >= 1000) return (n/1000).toFixed(1).replace('.0','') + ' k';
+  return String(n);
+}
+
+function buildCard(r, query, dataIdx){
+  const c = cfg(r.label);
+  const wc = wordCount(r.transcript);
+  const flag = {"fr":"🇫🇷","en":"🇬🇧","es":"🇪🇸","de":"🇩🇪","it":"🇮🇹","pt":"🇵🇹","nl":"🇳🇱","ar":"🇸🇦"}[r.lang] || "🌐";
+  const metaUrl = r.ad_id ? `https://www.facebook.com/ads/library/?id=${r.ad_id}` : null;
+  const metaBtn = metaUrl
+    ? `<a class="meta-link" href="${metaUrl}" target="_blank" rel="noopener">Voir sur Meta ↗</a>`
+    : `<span class="meta-link disabled">ID non disponible</span>`;
+  const preview = highlight((r.transcript.substring(0,280) + (r.transcript.length>280?"...":"")), query);
+  const fullText = r.transcript.replace(/</g,"&lt;");
+  const pageHtml = r.page_name ? `<span class="page-name">📄 ${r.page_name}</span>` : "";
+  const reachHtml = r.eu_reach
+    ? `<span class="reach-badge" title="Couverture totale UE (donnée officielle Meta)">📡 ${fmtReach(r.eu_reach)} personnes</span>`
+    : "";
+  const bodyHtml = r.ad_body ? `<div class="ad-body">${r.ad_body}</div>` : "";
+  const vaHtml = buildVisualInfo(r.visual_analysis);
+  const scoreBadge = buildScoreBadge(r.scoring);
+  const scoreVal = (r.scoring || {}).score_total || 0;
+  return `
+<div class="card" data-label="${r.label}" data-pos="${r.position}" data-words="${wc}" data-score="${scoreVal}"
+     data-text="${r.transcript.toLowerCase().replace(/"/g,'&quot;')}"
+     style="border-left-color:${c.border};background:${c.bg}">
+  <div class="card-top">
+    <span class="badge" style="background:${c.badge_bg};color:${c.badge_fg}">${c.icon} ${r.label}</span>
+    <span class="pos">#${r.position}</span>
+    ${scoreBadge}
+    ${metaBtn}
+  </div>
+  ${pageHtml}
+  ${reachHtml}
+  ${bodyHtml}
+  ${vaHtml}
+  <div class="transcript-preview">${preview}</div>
+  <div class="card-footer">
+    <span class="lang-badge">${flag} ${r.lang || "?"}</span>
+    <span class="word-count">${wc} mots</span>
+    <button class="copy-btn" onclick="copyTranscript(this, \`${fullText}\`)">Copier</button>
+  </div>
+  <details>
+    <summary>Transcription complète</summary>
+    <pre>${fullText}</pre>
+  </details>
+  <button class="adapt-btn" onclick="adaptScript(${dataIdx})">🎯 Adapter à mon produit</button>
+</div>`;
+}
+
+function applyFilters(){
+  const query = document.getElementById("search").value.trim().toLowerCase();
+  const sort = document.getElementById("sort").value;
+  const grid = document.getElementById("grid");
+
+  let filtered = DATA.filter(r => {
+    if(currentLabel !== "all" && r.label !== currentLabel) return false;
+    if(currentKw && !r.transcript.toLowerCase().includes(currentKw)) return false;
+    if(query && !r.transcript.toLowerCase().includes(query)
+             && !(r.page_name||"").toLowerCase().includes(query)
+             && !(r.ad_body||"").toLowerCase().includes(query)) return false;
+    return true;
+  });
+
+  const sc = r => (r.scoring || {}).score_total || 0;
+  const rch = r => r.eu_reach || 0;
+  if(sort === "score_desc") filtered.sort((a,b) => sc(b) - sc(a));
+  else if(sort === "score_asc") filtered.sort((a,b) => sc(a) - sc(b));
+  else if(sort === "reach_desc") filtered.sort((a,b) => rch(b) - rch(a));
+  else if(sort === "words_desc") filtered.sort((a,b) => wordCount(b.transcript) - wordCount(a.transcript));
+  else if(sort === "words_asc") filtered.sort((a,b) => wordCount(a.transcript) - wordCount(b.transcript));
+  else filtered.sort((a,b) => a.position - b.position);
+
+  grid.innerHTML = filtered.map(r => buildCard(r, query, DATA.indexOf(r))).join("");
+  document.getElementById("empty").classList.toggle("hidden", filtered.length > 0);
+  updateStats(filtered);
+}
+
+function filterLabel(label){
+  currentLabel = label;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  event.target.classList.add("active");
+  applyFilters();
+}
+
+function filterByKw(el){
+  const kw = el.dataset.kw;
+  if(currentKw === kw){
+    currentKw = null;
+    document.querySelectorAll(".kw").forEach(k => k.classList.remove("active"));
+  } else {
+    currentKw = kw;
+    document.querySelectorAll(".kw").forEach(k => k.classList.toggle("active", k.dataset.kw === kw));
+  }
+  applyFilters();
+}
+
+function updateStats(filtered){
+  const labels = [...new Set(filtered.map(r => r.label))];
+  let html = `<div class="stat"><div class="n">${filtered.length}</div><div class="l">résultats</div></div>`;
+  labels.forEach(l => {
+    const c = cfg(l);
+    const n = filtered.filter(r => r.label === l).length;
+    html += `<div class="stat"><div class="n" style="color:${c.border}">${n}</div><div class="l">${c.icon} ${l}</div></div>`;
+  });
+  const withId = filtered.filter(r => r.ad_id).length;
+  const withVision = filtered.filter(r => r.visual_analysis && Object.keys(r.visual_analysis).length).length;
+  const withScore = filtered.filter(r => r.scoring && r.scoring.score_total != null);
+  html += `<div class="stat"><div class="n">${withId}</div><div class="l">liens Meta dispo</div></div>`;
+  if(withVision) html += `<div class="stat"><div class="n" style="color:#7c3aed">${withVision}</div><div class="l">📷 Analysés visuel</div></div>`;
+  if(withScore.length) {
+    const avg = (withScore.reduce((s,r) => s + r.scoring.score_total, 0) / withScore.length).toFixed(1);
+    const avgCls = avg >= 8 ? "#155724" : avg >= 5 ? "#856404" : "#721c24";
+    html += `<div class="stat"><div class="n" style="color:${avgCls}">${avg}</div><div class="l">⭐ Score moyen (${withScore.length} pubs)</div></div>`;
+  }
+  document.getElementById("stats-bar").innerHTML = html;
+}
+
+function copyTranscript(btn, text){
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = "✓ Copié";
+    btn.classList.add("copied");
+    setTimeout(() => { btn.textContent = "Copier"; btn.classList.remove("copied"); }, 2000);
+  });
+}
+
+applyFilters();
+</script>
+</body>
+</html>

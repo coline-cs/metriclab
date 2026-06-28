@@ -1,0 +1,11 @@
+streamlit>=1.35
+anthropic>=0.25
+requests
+beautifulsoup4
+
+# Scraping (lourd — désactiver sur Railway si mémoire limitée)
+playwright>=1.44
+
+# Transcription (très lourd — optionnel en prod)
+# openai-whisper
+# torch
