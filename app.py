@@ -373,7 +373,57 @@ h1, h2, h3 {
 /* ── Slider ── */
 .stSlider div[data-testid="stTickBarMin"],
 .stSlider div[data-testid="stTickBarMax"] { color: #999 !important; }
-h3 { color: #0a0a0a !important; font-weight: 700 !important; }
+
+/* ── Mobile responsive ── */
+@media (max-width: 768px) {
+    /* Header plus compact */
+    .ml-logo { font-size: 1.4rem !important; }
+    .ml-tagline { font-size: .65rem !important; }
+    .ml-header { padding: 12px 0 8px !important; }
+
+    /* Stats : 3 colonnes sur 2 lignes */
+    [data-testid="stHorizontalBlock"]:has(.stat-card) {
+        flex-wrap: wrap !important;
+    }
+    [data-testid="stHorizontalBlock"]:has(.stat-card) > [data-testid="column"] {
+        min-width: calc(33.33% - 8px) !important;
+        flex: 0 0 calc(33.33% - 8px) !important;
+    }
+    .stat-card { padding: 12px 8px !important; }
+    .stat-card .n { font-size: 1.5rem !important; }
+    .stat-card .l { font-size: .62rem !important; }
+
+    /* Navigation : scroll horizontal, texte compact */
+    div[data-testid="stSegmentedControl"],
+    div[data-testid="stButtonGroup"] {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        padding: 4px !important;
+    }
+    div[data-testid="stSegmentedControl"] button,
+    div[data-testid="stButtonGroup"] button {
+        font-size: .75rem !important;
+        padding: 5px 9px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Colonnes formulaires : stack vertical */
+    [data-testid="stHorizontalBlock"]:not(:has(.stat-card)) {
+        flex-wrap: wrap !important;
+    }
+    [data-testid="stHorizontalBlock"]:not(:has(.stat-card)) > [data-testid="column"] {
+        min-width: 100% !important;
+    }
+
+    /* Onboarding : 3 colonnes maintenues */
+    .ob-steps { gap: 6px !important; }
+
+    /* Main container padding */
+    [data-testid="stMainBlockContainer"] {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
