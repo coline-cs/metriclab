@@ -388,16 +388,24 @@ with st.sidebar:
             st.divider()
 
     st.markdown("### ⚙️ Configuration")
+    _admin_email = "chantelouxc@gmail.com"
+    _current_user = get_current_user() if AUTH_AVAILABLE else None
+    _is_admin = _current_user and _current_user.get("email") == _admin_email
+    _api_default = os.environ.get("ANTHROPIC_API_KEY", "") if _is_admin else st.session_state.get("_user_api_key", "")
     api_key_input = st.text_input(
         "Clé Anthropic API",
         type="password",
-        value=os.environ.get("ANTHROPIC_API_KEY", ""),
+        value=_api_default,
         help="Obtiens ta clé sur console.anthropic.com",
     )
     if api_key_input:
         # Nettoyage agressif : espaces, retours ligne, guillemets, caractères invisibles
         _clean_key = "".join(api_key_input.split()).strip('"').strip("'").strip()
-        os.environ["ANTHROPIC_API_KEY"] = _clean_key
+        st.session_state["_user_api_key"] = _clean_key
+        if _is_admin:
+            os.environ["ANTHROPIC_API_KEY"] = _clean_key
+        else:
+            os.environ["ANTHROPIC_API_KEY"] = _clean_key  # actif pour cette session uniquement
 
         if _clean_key.startswith("sk-ant-admin"):
             st.error("❌ C'est une clé ADMIN — elle ne peut pas appeler les modèles. Crée une clé API standard sur console.anthropic.com → API Keys.")
@@ -655,7 +663,7 @@ if _nav == "🏢 Marques":
             with st.expander("Ajouter une marque", expanded=_open_form or len(brands_list) == 0):
                 _PERF_LEVELS_FORM = ["⭐ Top Performers", "🆕 Nouvelles Créas", "🧪 En test", "💡 Inspiration"]
                 _fa, _fb = st.columns([2, 5])
-                _new_name  = _fa.text_input("Nom", placeholder="ex: Bonjour", key="bn")
+                _new_name  = _fa.text_input("Nom", placeholder="ex: Nike, Sephora…", key="bn")
                 _new_url   = _fb.text_input("URL Meta Ads Library", placeholder="https://www.facebook.com/ads/library/?...", key="bu")
                 _sections_opts = load_sections()
                 _fc, _fd = st.columns([1, 1])
