@@ -13,6 +13,13 @@ from pathlib import Path
 
 import streamlit as st
 
+# Auth — doit être importé avant st.set_page_config
+try:
+    from auth import get_current_user, get_current_user_id, render_login_page, sign_out
+    AUTH_AVAILABLE = True
+except ImportError:
+    AUTH_AVAILABLE = False
+
 BASE_DIR = Path(__file__).parent
 OUTPUT_DIR = BASE_DIR / "transcriptions"
 GENERATED_DIR = BASE_DIR / "generated_copy"
@@ -60,6 +67,11 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
+
+# ── Auth gate ────────────────────────────────
+if AUTH_AVAILABLE:
+    if not get_current_user():
+        render_login_page()
 
 st.markdown("""
 <style>
@@ -366,6 +378,15 @@ st.markdown("""
 # SIDEBAR — clé API + options
 # ──────────────────────────────────────────────
 with st.sidebar:
+    if AUTH_AVAILABLE:
+        user = get_current_user()
+        if user:
+            st.markdown(f"👤 **{user['email']}**")
+            if st.button("Se déconnecter", use_container_width=True):
+                sign_out()
+                st.rerun()
+            st.divider()
+
     st.markdown("### ⚙️ Configuration")
     api_key_input = st.text_input(
         "Clé Anthropic API",
