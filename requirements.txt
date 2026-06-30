@@ -2,6 +2,7 @@ streamlit>=1.35
 anthropic>=0.25
 requests
 beautifulsoup4
+supabase>=2.4.0
 
 # Scraping (lourd — désactiver sur Railway si mémoire limitée)
 playwright>=1.44

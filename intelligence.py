@@ -311,3 +311,281 @@ def generate_from_pattern_stream(
                 yield text
     except Exception as e:
         yield f"\n⚠ Erreur : {e}\n"
+
+
+# ── Clustering sémantique des hooks ──────────────────────────────────────────
+
+_HOOK_CLUSTER_PROMPT = """\
+Tu es expert en psychologie de la persuasion appliquée à la publicité vidéo Meta Ads.
+
+Voici {n} hooks (accroches des 3 premières secondes) issus de pubs dans le secteur compléments/santé/bien-être :
+
+{hooks_block}
+
+Ta mission : regrouper ces hooks par MÉCANISME PSYCHOLOGIQUE sous-jacent — pas par sujet, mais par la mécanique émotionnelle qui pousse à continuer de regarder.
+
+Réponds UNIQUEMENT en JSON valide :
+{{
+  "clusters": [
+    {{
+      "mechanism": "nom_technique_court",
+      "label": "Nom lisible (ex: Culpabilité du propriétaire)",
+      "description": "Comment ce mécanisme fonctionne psychologiquement",
+      "why_it_works": "Pourquoi le cerveau répond à ce déclencheur",
+      "best_contexts": "Dans quels cas l'utiliser (produit, audience, funnel stage)",
+      "hook_ids": [1, 3, 7],
+      "strength_avg": 7.5,
+      "template": "Template générique réutilisable : [Élément A] → [Élément B]"
+    }}
+  ],
+  "dominant_mechanism": "mécanisme le plus utilisé dans ce dataset",
+  "underused_opportunity": "mécanisme peu ou pas utilisé mais qui fonctionnerait bien dans ce secteur",
+  "recommendation": "Conseil stratégique en 2 phrases sur ce qu'on devrait tester en priorité"
+}}"""
+
+
+def cluster_hooks(transcriptions: list[dict], api_key: str) -> dict:
+    """Regroupe les hooks par mécanisme psychologique sous-jacent.
+
+    Utilise hook_3s si disponible, sinon les 120 premiers caractères du transcript.
+    Retourne des clusters avec mécanisme, template réutilisable et recommandation.
+    """
+    if not api_key:
+        return {"error": "Clé API manquante"}
+
+    ads_with_hooks = []
+    for r in transcriptions:
+        hook = r.get("hook_3s") or r.get("transcript", "")[:120]
+        if hook.strip():
+            hook_score = (r.get("hook_scoring") or {}).get("stop_scroll_score")
+            ads_with_hooks.append({
+                "id": r.get("position", len(ads_with_hooks) + 1),
+                "hook": hook.strip(),
+                "hook_score": hook_score,
+                "brand": r.get("page_name") or "?",
+                "reach": r.get("eu_reach"),
+                "format": r.get("ad_format") or "?",
+            })
+
+    if not ads_with_hooks:
+        return {"error": "Aucun hook disponible"}
+
+    hooks_block = "\n".join(
+        f"[{a['id']}] {a['brand']} · {a['format']}"
+        + (f" · score {a['hook_score']}/10" if a['hook_score'] else "")
+        + (f" · {a['reach']:,} reach" if a['reach'] else "")
+        + f"\n\"{a['hook']}\""
+        for a in ads_with_hooks
+    )
+
+    try:
+        import anthropic as _ant
+        client = _ant.Anthropic(api_key=api_key)
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=2000,
+            messages=[{"role": "user", "content": _HOOK_CLUSTER_PROMPT.format(
+                n=len(ads_with_hooks),
+                hooks_block=hooks_block,
+            )}],
+        )
+        text = response.content[0].text.strip()
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            result = json.loads(m.group())
+            result["_ads_analyzed"] = len(ads_with_hooks)
+            return result
+    except Exception as e:
+        return {"error": str(e)}
+
+    return {}
+
+
+# ── Générateur de brief vidéo ─────────────────────────────────────────────────
+
+_BRIEF_PROMPT = """\
+Tu es creative strategist Meta Ads senior. Génère un brief de production vidéo complet basé sur les patterns gagnants identifiés dans ce dataset.
+
+DONNÉES DISPONIBLES :
+- Patterns hooks dominants : {hook_mechanisms}
+- Format le plus performant : {top_format}
+- Score hook moyen dataset : {avg_hook_score}/10
+- Mécanisme hook le plus utilisé : {dominant_mechanism}
+- Top performers (reach + longévité) :
+{top_ads_block}
+
+PRODUIT CIBLE :
+{product_context}
+
+OBJECTIF DU BRIEF : {brief_objective}
+
+Génère un brief vidéo complet en JSON :
+{{
+  "concept": "<concept créatif en 1 phrase — ce dont parle la vidéo>",
+  "hook": {{
+    "mechanism": "<mécanisme psychologique>",
+    "script": "<script exact du hook 0-3s — 15 mots max>",
+    "visual": "<ce qu'on voit à l'écran pendant le hook>",
+    "why": "<pourquoi ce hook va stopper le scroll>"
+  }},
+  "structure": [
+    {{
+      "section": "Problème (3-8s)",
+      "script": "<script>",
+      "visual": "<direction visuelle>"
+    }},
+    {{
+      "section": "Agitation (8-15s)",
+      "script": "<script>",
+      "visual": "<direction visuelle>"
+    }},
+    {{
+      "section": "Solution (15-25s)",
+      "script": "<script>",
+      "visual": "<direction visuelle>"
+    }},
+    {{
+      "section": "Preuve (25-35s)",
+      "script": "<script>",
+      "visual": "<direction visuelle>"
+    }},
+    {{
+      "section": "CTA (35-45s)",
+      "script": "<script>",
+      "visual": "<direction visuelle>"
+    }}
+  ],
+  "format": "<ugc | founder | animated | voiceover | ugc_text>",
+  "format_reason": "<pourquoi ce format pour ce concept>",
+  "casting": "<profil exact du talent si applicable : âge, genre, énergie, style>",
+  "music_mood": "<ambiance musicale recommandée>",
+  "text_overlays": ["<3-4 overlays texte clés à afficher à l'écran>"],
+  "duration": "<durée cible en secondes>",
+  "kpis_target": {{
+    "hook_rate_target": "<% de rétention à 3s visé>",
+    "estimated_hook_score": <int 0-10>,
+    "why_it_will_work": "<analyse en 2 phrases>"
+  }}
+}}"""
+
+
+def generate_video_brief(
+    transcriptions: list[dict],
+    api_key: str,
+    product_context: str = "",
+    brief_objective: str = "Acquérir de nouveaux clients",
+) -> dict:
+    """Génère un brief vidéo complet basé sur les patterns gagnants du dataset."""
+    if not api_key:
+        return {"error": "Clé API manquante"}
+
+    # Extraire les top performers
+    tops = sorted(
+        [r for r in transcriptions if r.get("eu_reach") or r.get("scoring")],
+        key=lambda r: (r.get("eu_reach") or 0),
+        reverse=True,
+    )[:5]
+
+    # Mécanismes hooks dominants
+    mech_counts: dict[str, int] = {}
+    hook_scores = []
+    for r in transcriptions:
+        hs = r.get("hook_scoring") or {}
+        if hs.get("mechanism_label"):
+            m = hs["mechanism_label"]
+            mech_counts[m] = mech_counts.get(m, 0) + 1
+        if hs.get("stop_scroll_score"):
+            hook_scores.append(hs["stop_scroll_score"])
+
+    dominant_mechanism = max(mech_counts, key=mech_counts.get) if mech_counts else "Non déterminé"
+    avg_hook_score = round(sum(hook_scores) / len(hook_scores), 1) if hook_scores else "?"
+
+    # Format le plus performant
+    fmt_reach: dict[str, int] = {}
+    for r in transcriptions:
+        fmt = r.get("ad_format") or "unknown"
+        fmt_reach[fmt] = fmt_reach.get(fmt, 0) + (r.get("eu_reach") or 0)
+    top_format = max(fmt_reach, key=fmt_reach.get) if fmt_reach else "ugc"
+
+    # Bloc top ads
+    top_ads_lines = []
+    for r in tops:
+        reach = r.get("eu_reach")
+        hook = r.get("hook_3s") or r.get("transcript", "")[:80]
+        top_ads_lines.append(
+            f"• [{r.get('page_name','?')} · {r.get('ad_format','?')}]"
+            + (f" {reach:,} reach" if reach else "")
+            + f"\n  Hook: \"{hook.strip()[:100]}\""
+        )
+
+    try:
+        import anthropic as _ant
+        client = _ant.Anthropic(api_key=api_key)
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=2500,
+            messages=[{"role": "user", "content": _BRIEF_PROMPT.format(
+                hook_mechanisms=", ".join(f"{m}({c})" for m, c in sorted(mech_counts.items(), key=lambda x: -x[1])[:5]),
+                top_format=top_format,
+                avg_hook_score=avg_hook_score,
+                dominant_mechanism=dominant_mechanism,
+                top_ads_block="\n".join(top_ads_lines) or "Aucun top performer disponible",
+                product_context=product_context[:500] if product_context else "Non défini",
+                brief_objective=brief_objective,
+            )}],
+        )
+        text = response.content[0].text.strip()
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        if m:
+            return json.loads(m.group())
+    except Exception as e:
+        return {"error": str(e)}
+
+    return {}
+
+
+# ── Comparaison cross-sections ────────────────────────────────────────────────
+
+def compare_sections(transcriptions: list[dict]) -> dict:
+    """Compare les performances entre sections (Top Performers, Nouvelles Créas, etc.).
+    Retourne stats par section : reach moyen, score hook moyen, format dominant.
+    """
+    sections: dict[str, dict] = {}
+
+    for r in transcriptions:
+        label = r.get("label") or "Non classé"
+        if label not in sections:
+            sections[label] = {
+                "ads": [], "reaches": [], "hook_scores": [],
+                "formats": {}, "mechanisms": {},
+            }
+        s = sections[label]
+        s["ads"].append(r)
+        if r.get("eu_reach"):
+            s["reaches"].append(r["eu_reach"])
+        hs = r.get("hook_scoring") or {}
+        if hs.get("stop_scroll_score"):
+            s["hook_scores"].append(hs["stop_scroll_score"])
+        fmt = r.get("ad_format") or "unknown"
+        s["formats"][fmt] = s["formats"].get(fmt, 0) + 1
+        mech = hs.get("mechanism_label") or "?"
+        if mech != "?":
+            s["mechanisms"][mech] = s["mechanisms"].get(mech, 0) + 1
+
+    result = {}
+    for label, data in sections.items():
+        reaches = data["reaches"]
+        hook_scores = data["hook_scores"]
+        fmts = data["formats"]
+        mechs = data["mechanisms"]
+        result[label] = {
+            "ad_count":          len(data["ads"]),
+            "avg_reach":         int(sum(reaches) / len(reaches)) if reaches else None,
+            "max_reach":         max(reaches) if reaches else None,
+            "avg_hook_score":    round(sum(hook_scores) / len(hook_scores), 1) if hook_scores else None,
+            "top_format":        max(fmts, key=fmts.get) if fmts else None,
+            "top_mechanism":     max(mechs, key=mechs.get) if mechs else None,
+            "formats_breakdown": fmts,
+            "mechanisms_breakdown": mechs,
+        }
+    return result

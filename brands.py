@@ -1,26 +1,23 @@
 #!/usr/bin/env python3
 """
 Gestionnaire de marques — sauvegarde les comptes Meta à scraper.
+Toutes les opérations passent par db.py (Supabase ou JSON fallback).
 """
 import json
 from datetime import datetime
 from pathlib import Path
 
+import db as _db
+
 BRANDS_FILE = Path(__file__).parent / "transcriptions" / "brands.json"
 
 
 def load_brands() -> list[dict]:
-    if BRANDS_FILE.exists():
-        try:
-            return json.loads(BRANDS_FILE.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return []
+    return _db.load_brands()
 
 
 def save_brands(brands: list[dict]):
-    BRANDS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    BRANDS_FILE.write_text(json.dumps(brands, ensure_ascii=False, indent=2), encoding="utf-8")
+    _db.save_brands(brands)
 
 
 NICHES = {
@@ -29,6 +26,26 @@ NICHES = {
     "🍵 Boissons santé": "Bonjour, Athletic Greens, matcha, functional drinks",
     "🛒 E-commerce similaire": "Autre marque DTC avec structure pub similaire",
 }
+
+SECTIONS_FILE = Path(__file__).parent / "transcriptions" / "sections.json"
+
+DEFAULT_SECTIONS = ["Top Performers", "Nouvelles Créas"]
+
+
+def load_sections() -> list[str]:
+    return _db.load_sections()
+
+
+def save_sections(sections: list[str]):
+    _db.save_sections(sections)
+
+
+def add_section(name: str) -> list[str]:
+    return _db.add_section(name)
+
+
+def remove_section(name: str) -> list[str]:
+    return _db.remove_section(name)
 
 
 def add_brand(name: str, url: str, label: str = "Top Performers", notes: str = "", niche: str = "🐾 Animaux") -> dict:
@@ -39,31 +56,33 @@ def add_brand(name: str, url: str, label: str = "Top Performers", notes: str = "
         "label": label.strip() or "Top Performers",
         "notes": notes.strip(),
         "niche": niche,
+        "tags": [label.strip()] if label.strip() else [],
         "last_scraped": None,
         "ad_count": 0,
         "avg_score": None,
+        "created_at": datetime.now().isoformat(),
     }
-    brands = load_brands()
-    brands = [b for b in brands if b.get("url") != url.strip()]  # dédoublonnage
-    brands.append(brand)
-    save_brands(brands)
+    # dédoublonnage par URL
+    existing = load_brands()
+    existing = [b for b in existing if b.get("url") != url.strip()]
+    existing.append(brand)
+    save_brands(existing)
+    _db.upsert_brand(brand)
     return brand
 
 
 def update_brand_stats(brand_id: str, ad_count: int, avg_score: float = None):
-    brands = load_brands()
-    for b in brands:
-        if b.get("id") == brand_id:
-            b["last_scraped"] = datetime.now().strftime("%d/%m/%Y %H:%M")
-            b["ad_count"] = ad_count
-            if avg_score is not None:
-                b["avg_score"] = round(avg_score, 1)
-    save_brands(brands)
+    fields = {
+        "last_scraped": datetime.now().isoformat(),
+        "ad_count": ad_count,
+    }
+    if avg_score is not None:
+        fields["avg_score"] = round(avg_score, 1)
+    _db.update_brand_fields(brand_id, fields)
 
 
 def remove_brand(brand_id: str):
-    brands = [b for b in load_brands() if b.get("id") != brand_id]
-    save_brands(brands)
+    _db.delete_brand(brand_id)
 
 
 def get_brand_live_stats(brand: dict, transcriptions: list[dict]) -> dict:

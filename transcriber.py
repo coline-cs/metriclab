@@ -25,7 +25,7 @@ from playwright.async_api import async_playwright
 OUTPUT_DIR = Path("transcriptions")
 SCROLL_COUNT = 5
 SCROLL_PAUSE = 2.5
-WHISPER_MODEL = "base"
+WHISPER_MODEL = "small"  # small = bien meilleur sur le français, surtout pour les hooks
 
 LANG_FLAG = {
     "fr": "🇫🇷", "en": "🇬🇧", "es": "🇪🇸", "de": "🇩🇪",
@@ -92,6 +92,7 @@ async def scrape_video_urls(ads_library_url: str, label: str) -> list[dict]:
         page = await context.new_page()
 
         ad_data_map: dict[str, dict] = {}
+        ad_id_map: dict[str, dict] = {}
 
         async def on_response(response):
             url = response.url
@@ -100,7 +101,7 @@ async def scrape_video_urls(ads_library_url: str, label: str) -> list[dict]:
                     text = await response.text()
                     clean = text.lstrip("for (;;);").strip()
                     data = json.loads(clean)
-                    _parse_api_response(data, ad_data_map)
+                    _parse_api_response(data, ad_data_map, ad_id_map=ad_id_map)
                 except Exception:
                     pass
             if (
@@ -156,13 +157,28 @@ async def scrape_video_urls(ads_library_url: str, label: str) -> list[dict]:
                 item["page_name"] = item["page_name"] or ad_cards[i].get("page_name")
                 item["ad_body"] = item["ad_body"] or ad_cards[i].get("body")
 
+        # Enrichir avec le reach via ad_id_map (fallback quand l'URL vidéo n'a pas matché)
+        for item in video_items:
+            if item.get("eu_reach") is None and item.get("ad_id"):
+                meta = ad_id_map.get(str(item["ad_id"]))
+                if meta:
+                    item["eu_reach"] = item["eu_reach"] or meta.get("eu_reach")
+                    item["start_date"] = item["start_date"] or meta.get("start_date")
+                    item["page_name"] = item["page_name"] or meta.get("page_name")
+                    item["ad_body"] = item["ad_body"] or meta.get("body")
+            print(f"  → #{item['position']} | id={item.get('ad_id')} | reach={item.get('eu_reach')} | page={item.get('page_name')}")
+
         await asyncio.sleep(2)
         await browser.close()
 
     return video_items
 
 
-def _parse_api_response(obj, result_map: dict, depth=0):
+def _parse_api_response(obj, result_map: dict, depth=0, ad_id_map: dict = None):
+    """Extrait les données des réponses API Meta.
+    result_map  : keyed by video URL (pour matcher les vidéos interceptées)
+    ad_id_map   : keyed by ad_id (fallback pour le reach quand l'URL ne matche pas)
+    """
     if depth > 10:
         return
     if isinstance(obj, dict):
@@ -187,11 +203,18 @@ def _parse_api_response(obj, result_map: dict, depth=0):
                     "ad_id": ad_id, "page_name": page_name, "body": body,
                     "eu_reach": eu_reach, "start_date": start_date,
                 }
+        # Fallback : stocker aussi par ad_id pour récupérer le reach même sans URL vidéo
+        if ad_id and ad_id_map is not None:
+            if ad_id not in ad_id_map or (eu_reach and not ad_id_map[ad_id].get("eu_reach")):
+                ad_id_map[ad_id] = {
+                    "page_name": page_name, "body": body,
+                    "eu_reach": eu_reach, "start_date": start_date,
+                }
         for v in obj.values():
-            _parse_api_response(v, result_map, depth + 1)
+            _parse_api_response(v, result_map, depth + 1, ad_id_map)
     elif isinstance(obj, list):
         for item in obj:
-            _parse_api_response(item, result_map, depth + 1)
+            _parse_api_response(item, result_map, depth + 1, ad_id_map)
 
 
 # ──────────────────────────────────────────────────────────────
@@ -221,11 +244,30 @@ def download_video(url: str, output_path: Path) -> bool:
 # 3. TRANSCRIPTION
 # ──────────────────────────────────────────────────────────────
 
-def transcribe_video(video_path: Path, model) -> tuple[str, str]:
-    result = model.transcribe(str(video_path), fp16=False)
-    lang = result.get("language", "?")
-    text = result["text"].strip()
-    return text, lang
+def transcribe_video(video_path: Path, model) -> tuple[str, str, str, list]:
+    """Transcrit et extrait le hook exact (0-3s) via les timestamps Whisper.
+    Retourne: (transcript_complet, langue, hook_0_3s, segments)
+    """
+    result = model.transcribe(str(video_path), fp16=False, word_timestamps=True)
+    lang   = result.get("language", "?")
+    text   = result["text"].strip()
+
+    # Hook exact = tout ce qui est dit dans les 3 premières secondes
+    hook_parts = []
+    for seg in result.get("segments", []):
+        if seg.get("start", 0) <= 3.0:
+            hook_parts.append(seg["text"].strip())
+        else:
+            break
+    hook_3s = " ".join(hook_parts).strip() or text[:120]
+
+    # Segments pour analyse de durée et rythme
+    segments = [
+        {"start": s["start"], "end": s["end"], "text": s["text"].strip()}
+        for s in result.get("segments", [])
+    ]
+
+    return text, lang, hook_3s, segments
 
 
 # ──────────────────────────────────────────────────────────────
@@ -299,17 +341,34 @@ def analyze_frames_visually(frames: list[Path], api_key: str) -> dict:
     content.append({
         "type": "text",
         "text": (
-            "Analyse ces frames d'une publicité vidéo Meta Ads (Facebook/Instagram). "
-            "Réponds UNIQUEMENT avec du JSON valide sans markdown ni explication :\n"
-            '{"scene_type":"UGC/studio/lifestyle/talking_head/animation/screen_recording",'
-            '"hook_visual":"description précise de ce qu on voit dans les 1ères secondes",'
-            '"text_overlays":["textes lisibles à l écran, [] si aucun"],'
-            '"setting":"lieu ou environnement filmé",'
-            '"product_visible":true,'
-            '"product_presentation":"comment et quand le produit apparaît, null si absent",'
-            '"visual_style":"description du style visuel global en 10 mots max",'
-            '"color_palette":["2-3 couleurs dominantes"],'
-            '"actors":"description des personnes présentes"}'
+            "Tu es expert en analyse de publicités vidéo Meta Ads. "
+            "Analyse ces frames et identifie avec précision le format et la structure visuelle.\n\n"
+            "Réponds UNIQUEMENT avec du JSON valide (pas de markdown) :\n"
+            '{\n'
+            '  "ad_format": "ugc|founder|trottoir|explicatif|ai_video|animated|demo|talking_head|pov",\n'
+            '  "ad_format_confidence": 0.0-1.0,\n'
+            '  "ad_format_reason": "pourquoi ce format (ex: visage humain non professionnel, selfie cam, décor maison)",\n'
+            '  "scene_type": "selfie_interieur|studio|rue|nature|animation_2d|animation_3d|screen_recording|avatar_ia",\n'
+            '  "has_human_face": true/false,\n'
+            '  "face_type": "particulier|professionnel|fondateur|acteur|avatar_ia|aucun",\n'
+            '  "is_animated": true/false,\n'
+            '  "animation_style": "2D_dessin|3D_rendu|motion_design|aucun",\n'
+            '  "hook_visual": "ce que le spectateur voit exactement dans la 1ère seconde",\n'
+            '  "text_overlays": ["textes lisibles à l écran"],\n'
+            '  "product_visible": true/false,\n'
+            '  "visual_style": "description du style en 8 mots max",\n'
+            '  "production_quality": "amateur|semi-pro|pro|ia_generee"\n'
+            '}\n\n'
+            'Formats possibles :\n'
+            '- ugc: particulier filmé par lui-même (qualité amateur, selfie)\n'
+            '- founder: fondateur/équipe en studio ou cadre pro\n'
+            '- trottoir: interview dans la rue\n'
+            '- explicatif: schémas, graphiques, corps humain illustré\n'
+            '- ai_video: avatar IA ou vidéo générée par IA\n'
+            '- animated: dessin animé, cartoon, motion design\n'
+            '- demo: démonstration produit\n'
+            '- talking_head: expert face caméra, éclairage pro\n'
+            '- pov: point de vue animal ou personnage non humain'
         ),
     })
 
@@ -328,6 +387,69 @@ def analyze_frames_visually(frames: list[Path], api_key: str) -> dict:
         print(f"    ⚠ Vision : {e}")
 
     return {}
+
+
+# ──────────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────────────────────
+# 3c. SCORE COMPOSITE OBJECTIF
+# ──────────────────────────────────────────────────────────────
+
+def compute_performance_score(entry: dict, all_entries: list[dict] = None) -> dict:
+    """Score composite 0-100 basé sur 3 signaux objectifs + 1 subjectif.
+
+    Composantes :
+      - Reach (40%)    : données Meta officiel (DSA) — signal le plus fiable
+      - Longévité (30%): jours actifs depuis start_date — Meta ne coupe pas ce qui performe
+      - Qualité (30%)  : score Claude sur le transcript (subjectif mais utile)
+
+    La normalisation se fait sur l'ensemble des pubs pour avoir un score relatif.
+    """
+    from datetime import date as _date
+
+    reach   = entry.get("eu_reach") or 0
+    scoring = entry.get("scoring") or {}
+    claude_score = scoring.get("score_total")  # 0-10
+
+    # Longévité
+    days = 0
+    sd = entry.get("start_date") or ""
+    if sd:
+        try:
+            days = (_date.today() - _date.fromisoformat(sd[:10])).days
+        except Exception:
+            pass
+
+    # Normalisation relative au dataset (si dispo)
+    max_reach = reach
+    max_days  = days
+    if all_entries:
+        reaches = [e.get("eu_reach") or 0 for e in all_entries]
+        ddays   = []
+        for e in all_entries:
+            s = e.get("start_date") or ""
+            if s:
+                try: ddays.append((_date.today() - _date.fromisoformat(s[:10])).days)
+                except: pass
+        max_reach = max(reaches) if reaches else 1
+        max_days  = max(ddays)   if ddays   else 1
+
+    reach_score    = min(100, (reach / max(max_reach, 1)) * 100) if max_reach else 0
+    longevity_score = min(100, (days  / max(max_days,  1)) * 100) if max_days  else 0
+    quality_score  = (claude_score / 10 * 100) if claude_score is not None else 50  # neutre si absent
+
+    composite = round(reach_score * 0.40 + longevity_score * 0.30 + quality_score * 0.30, 1)
+
+    has_objective_data = reach > 0 or days > 0
+
+    return {
+        "composite":        composite,
+        "reach_score":      round(reach_score, 1),
+        "longevity_score":  round(longevity_score, 1),
+        "quality_score":    round(quality_score, 1),
+        "days_active":      days,
+        "has_objective":    has_objective_data,
+        "confidence":       "high" if (reach > 0 and days > 0) else ("medium" if (reach > 0 or days > 0) else "low"),
+    }
 
 
 # ──────────────────────────────────────────────────────────────
@@ -751,46 +873,83 @@ async def main(url_label_pairs: list[tuple[str, str]]):
 
         print(f"    Transcription...")
         try:
-            transcript, lang = transcribe_video(video_path, model)
+            transcript, lang, hook_3s, segments = transcribe_video(video_path, model)
+            print(f"    🎣 Hook (0-3s) : {hook_3s[:80]}...")
 
-            # Analyse visuelle si possible
+            # Analyse visuelle — format détecté par Vision
             visual = {}
             if frames and api_key:
-                print(f"    🔍 Analyse visuelle...")
+                print(f"    🔍 Analyse visuelle (Vision)...")
                 visual = analyze_frames_visually(frames, api_key)
                 if visual:
-                    print(f"    ✓ {visual.get('scene_type', '?')} — {visual.get('hook_visual', '')[:60]}")
+                    fmt_detected = visual.get("ad_format", "?")
+                    confidence   = visual.get("ad_format_confidence", 0)
+                    reason       = visual.get("ad_format_reason", "")
+                    print(f"    ✓ Format : {fmt_detected} ({int(confidence*100)}%) — {reason[:60]}")
 
-            # Scoring intelligent
+            # Déduire ad_format depuis Vision (haute confiance) ou texte (fallback)
+            ad_format_source = "text"
+            if visual.get("ad_format") and visual.get("ad_format_confidence", 0) >= 0.6:
+                ad_format = visual["ad_format"]
+                ad_format_source = "vision"
+            else:
+                from intelligence import detect_format
+                ad_format = detect_format(transcript, visual)
+                ad_format_source = "text_fallback"
+
+            # Scoring qualité (subjectif, Claude)
             scoring = {}
+            hook_scoring = {}
+            body_scoring = {}
             if api_key:
                 try:
-                    from scorer import score_ad, load_scoring_context
+                    from scorer import score_ad, score_hook, score_body, load_scoring_context
                     from product_context import load_context, format_for_prompt as _fmt_prod
-                    _sc_ctx = load_scoring_context()
+                    _sc_ctx  = load_scoring_context()
                     _prod_str = _fmt_prod(load_context())
-                    print(f"    🎯 Scoring...")
+                    print(f"    🎯 Scoring qualité...")
                     scoring = score_ad(transcript, api_key, _prod_str, _sc_ctx.get("objective", ""))
                     if scoring:
                         print(f"    ⭐ {scoring.get('score_total', '?')}/10 — {scoring.get('verdict', '')}")
+                    print(f"    🎣 Scoring hook...")
+                    hook_scoring = score_hook(hook_3s, api_key, _prod_str)
+                    if hook_scoring:
+                        mech  = hook_scoring.get("mechanism_label", "?")
+                        score = hook_scoring.get("stop_scroll_score", "?")
+                        print(f"    🎣 Hook {score}/10 — {mech}")
+                    print(f"    📐 Scoring structure narrative...")
+                    body_scoring = score_body(transcript, api_key)
+                    if body_scoring:
+                        struct_score = body_scoring.get("overall_structure_score", "?")
+                        drop = body_scoring.get("drop_risk", "?")
+                        print(f"    📐 Structure {struct_score}/10 — drop risk: {drop}")
                 except Exception as _se:
                     print(f"    ⚠ Scoring ignoré : {_se}")
 
             entry = {
-                "label": item["label"],
-                "position": item["position"],
-                "lang": lang,
-                "transcript": transcript,
-                "url": item["url"],
-                "ad_id": item.get("ad_id"),
-                "page_name": item.get("page_name"),
-                "ad_body": item.get("ad_body"),
-                "eu_reach": item.get("eu_reach"),
-                "start_date": item.get("start_date"),
-                "visual_analysis": visual,
-                "frames": [str(f.name) for f in frames],
-                "scoring": scoring,
+                "label":            item["label"],
+                "position":         item["position"],
+                "lang":             lang,
+                "transcript":       transcript,
+                "hook_3s":          hook_3s,
+                "segments":         segments,
+                "url":              item["url"],
+                "ad_id":            item.get("ad_id"),
+                "page_name":        item.get("page_name"),
+                "ad_body":          item.get("ad_body"),
+                "eu_reach":         item.get("eu_reach"),
+                "start_date":       item.get("start_date"),
+                "visual_analysis":  visual,
+                "frames":           [str(f.name) for f in frames],
+                "ad_format":        ad_format,
+                "ad_format_source": ad_format_source,
+                "scoring":          scoring,
+                "hook_scoring":     hook_scoring,
+                "body_scoring":     body_scoring,
             }
+
+            # Score composite (calculé après, mis à jour en lot à la fin)
+            entry["performance"] = compute_performance_score(entry)
             transcript_path.write_text(json.dumps(entry, ensure_ascii=False, indent=2), encoding="utf-8")
             flag = LANG_FLAG.get(lang, "🌐")
             print(f"    {flag} [{lang}] {transcript[:100]}...")
@@ -801,11 +960,25 @@ async def main(url_label_pairs: list[tuple[str, str]]):
             video_path.unlink(missing_ok=True)
 
     if results:
+        # Recalcul du score composite relatif sur tout le dataset
+        for entry in results:
+            entry["performance"] = compute_performance_score(entry, results)
+
         json_path = OUTPUT_DIR / "all_transcriptions.json"
         json_path.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
         html_path = OUTPUT_DIR / "rapport.html"
         generate_html_report(results, html_path)
+
+        # Résumé performance
+        top = sorted(results, key=lambda r: r.get("performance", {}).get("composite", 0), reverse=True)
         print(f"\n✓ {len(results)} transcription(s) sauvegardée(s)")
+        print(f"\n📊 TOP PERFORMERS (score composite) :")
+        for r in top[:5]:
+            p = r.get("performance", {})
+            reach_str = f"reach={r.get('eu_reach') or '?'}"
+            fmt_str   = r.get("ad_format", "?")
+            conf_str  = f"[{r.get('ad_format_source','?')}]"
+            print(f"  #{r['position']} {fmt_str}{conf_str} — score {p.get('composite','?')}/100 | {reach_str} | {p.get('days_active',0)}j | hook: {r.get('hook_3s','')[:60]}")
         print(f"  → Ouvre : open \"{html_path}\"")
     else:
         print("\n✗ Aucune transcription produite.")

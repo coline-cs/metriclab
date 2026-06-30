@@ -1,38 +1,21 @@
-# Environnement Python
-.venv/
+# Secrets
+.env
+.env.*
+!.env.example
+
+# macOS metadata
+._*
+.DS_Store
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
-*.pyd
-.Python
-*.egg-info/
-dist/
-build/
 
-# Données locales (ne pas committer)
-transcriptions/all_transcriptions.json
-transcriptions/brands.json
-transcriptions/frames/
-transcriptions/*.txt
-generated_copy/
-transcriptions/product_context.json
-transcriptions/scoring_context.json
-
-# Logs
-*.log
+# Données locales (trop lourdes pour git)
+transcriptions/
+frames/
+*.mp4
+*.webm
+*.wav
 nohup.out
-/tmp/
-
-# Variables d'environnement
-.env
-.env.local
-
-# macOS
-.DS_Store
-.AppleDouble
-
-# Playwright
-playwright-report/
-
-# Modèles Whisper (trop lourds)
-*.pt

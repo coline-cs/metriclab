@@ -45,6 +45,121 @@ def save_scoring_context(data: dict):
     SCORING_CONTEXT_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+_HOOK_PROMPT = """\
+Tu es expert en creative strategy Meta Ads. Analyse UNIQUEMENT cette accroche (hook) de publicité vidéo — les premières secondes qui décident si le spectateur continue à regarder ou scrolle.
+
+HOOK (0-3 secondes) :
+\"\"\"{hook}\"\"\"
+
+Contexte produit (optionnel) : {product_context}
+
+Réponds UNIQUEMENT avec du JSON valide, sans markdown :
+{{
+  "stop_scroll_score": <entier 0-10 — 10 = impossible de scroller, 0 = on scrolle immédiatement>,
+  "mechanism": "<mécanisme psychologique principal parmi : culpabilite_proprio | curiosite_scientifique | douleur_identification | transformation_before_after | autorite_expert | peur_perte | humor_surprise | social_proof | contradiction_choc | question_directe | stat_choc | story_personnelle>",
+  "mechanism_label": "<nom lisible du mécanisme en français, ex: Culpabilité du propriétaire>",
+  "hook_format": "<structure du hook parmi : question | affirmation_choc | stat | story | identification_probleme | contradiction | interpellation_directe | promesse>",
+  "emotional_trigger": "<émotion principale déclenchée : peur | curiosite | culpabilite | espoir | empathie | surprise | honte | fierté>",
+  "force_words": ["<2-3 mots ou expressions qui font toute la puissance>"],
+  "target_persona": "<qui est visé exactement en 1 phrase>",
+  "weakness": "<ce qui pourrait faire scroller quand même, null si parfait>",
+  "improved_version": "<version améliorée du hook qui conserve le mécanisme mais maximise le stop-scroll>",
+  "benchmark": "<comparaison avec des hooks similaires qu'on voit dans le secteur>"
+}}"""
+
+
+_BODY_PROMPT = """\
+Tu es expert en structure narrative de publicités vidéo Meta Ads. Analyse cette transcription complète section par section.
+
+TRANSCRIPTION :
+\"\"\"{transcript}\"\"\"
+
+Réponds UNIQUEMENT en JSON valide :
+{{
+  "hook": {{
+    "text": "<texte exact du hook, 0-3s>",
+    "score": <0-10>,
+    "verdict": "<verdict 5 mots>"
+  }},
+  "problem": {{
+    "text": "<comment le problème est présenté>",
+    "score": <0-10 — 10 = douleur viscérale, spécifique, que le viewer ressent immédiatement>,
+    "present": <true|false>,
+    "verdict": "<verdict 5 mots>"
+  }},
+  "proof": {{
+    "text": "<élément de preuve utilisé : chiffre, témoignage, étude, expert>",
+    "score": <0-10 — 10 = preuve béton vérifiable, 0 = aucune preuve>,
+    "proof_type": "<testimonial | stat | expert | before_after | demo | none>",
+    "present": <true|false>
+  }},
+  "solution": {{
+    "text": "<comment la solution est présentée>",
+    "score": <0-10 — 10 = solution claire, mécanisme expliqué, différenciation évidente>,
+    "present": <true|false>,
+    "verdict": "<verdict 5 mots>"
+  }},
+  "cta": {{
+    "text": "<texte exact du CTA>",
+    "score": <0-10 — 10 = urgence + bénéfice immédiat + action claire>,
+    "cta_type": "<link_bio | swipe_up | click_here | comment | dm | none>",
+    "present": <true|false>
+  }},
+  "overall_structure_score": <float 0-10 — moyenne pondérée : hook 30% + problème 20% + preuve 20% + solution 20% + cta 10%>,
+  "drop_risk": "<où le viewer risque de décrocher : after_hook | after_problem | middle | cta | none>",
+  "missing_elements": ["<éléments manquants ou faibles qui pénalisent la conversion>"],
+  "structure_verdict": "<verdict global de la structure narrative en 10 mots>"
+}}"""
+
+
+def score_body(transcript: str, api_key: str) -> dict:
+    """Analyse la structure narrative complète : hook / problème / preuve / solution / CTA.
+    Retourne un score par section + score global structure.
+    """
+    if not transcript.strip() or not api_key:
+        return {}
+    try:
+        import anthropic as _ant
+        client = _ant.Anthropic(api_key=api_key)
+        response = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=800,
+            messages=[{"role": "user", "content": _BODY_PROMPT.format(transcript=transcript[:2000])}],
+        )
+        text = response.content[0].text.strip()
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        return json.loads(m.group()) if m else {}
+    except Exception as e:
+        print(f"    ⚠ Body scoring : {e}")
+        return {}
+
+
+def score_hook(hook_3s: str, api_key: str, product_context: str = "") -> dict:
+    """Score spécifique du hook (0-3s) — mécanisme psychologique, force, amélioration.
+    Appelé en plus du score_ad global pour une analyse fine de l'accroche.
+    """
+    if not hook_3s.strip() or not api_key:
+        return {}
+    try:
+        import anthropic as _ant
+        client = _ant.Anthropic(api_key=api_key)
+        prompt = _HOOK_PROMPT.format(
+            hook=hook_3s[:300],
+            product_context=product_context[:200] if product_context else "non fourni"
+        )
+        response = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=600,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = response.content[0].text.strip()
+        m = re.search(r"\{.*\}", text, re.DOTALL)
+        return json.loads(m.group()) if m else {}
+    except Exception as e:
+        print(f"    ⚠ Hook scoring : {e}")
+        return {}
+
+
 def score_ad(transcript: str, api_key: str, product_context: str = "", objective: str = "") -> dict:
     """
     Score une publicité via Claude Haiku (~$0.001 par pub).

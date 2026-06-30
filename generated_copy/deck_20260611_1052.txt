@@ -1,0 +1,451 @@
+# 📝 Deck de Scripts — 7 angle(s) × 3 variantes
+
+*Basé sur 6 transcriptions scrapées · Audience : 🧊 Audience froide — ils ne nous connaissent pas*
+
+---
+
+## 🎓 Éducatif (1/7)
+*Révèle un problème méconnu que le client ne savait pas avoir*
+
+---
+**VARIANTE 1**
+[HOOK 0-3s] : "Si ton chien mange bien et bouge normalement… il a quand même des carences. Et t'es probablement en train de passer à côté."
+
+[CORPS 3-30s] : Parce que la nourriture industrielle — même la bonne, même la chère — elle est formulée pour couvrir le minimum. Pas pour optimiser. Pas pour la durée. Le truc c'est que les chiens ne te montrent pas qu'ils manquent de quelque chose. Ils continuent à jouer, à manger, à remuer la queue. Jusqu'au jour où les premiers signes apparaissent : les articulations qui raident, la digestion qui part en vrille, la vitalité qui baisse. Et là tu te dis "il vieillit" alors qu'en réalité, c'est un problème qui s'est construit en silence pendant des mois. Ce que j'ai compris c'est que la prévention, ça se fait maintenant — pas quand ça va déjà mal. C'est exactement pour ça qu'on a créé Jacqueline's Lab. Des compléments en soft chews formulés avec des vétérinaires nutritionnistes, avec les dosages affichés clairement, chaque ingrédient lisible. Digestion, mobilité, multivitamines — chaque formule cible un besoin précis. Pas une formule générique pour "tous les chiens". Une réponse concrète à ce que ton chien a vraiment besoin.
+
+[CTA] : Si t'as cinq secondes, réponds à quatre questions sur le site — on te dit exactement quelle formule correspond à ton chien.
+
+[DURÉE] : ~38 secondes
+
+[FORCE] : Joue sur la culpabilité silencieuse du propriétaire attentionné qui croit bien faire — le problème est invisible donc impossible à réfuter, ce qui crée une tension forte avant même de parler du produit.
+
+---
+
+---
+**VARIANTE 2**
+[HOOK 0-3s] : "Un chien qui gratte, qui a le ventre qui gargouille, qui se lève doucement le matin — c'est pas 'son caractère'. C'est souvent son alimentation."
+
+[CORPS 3-30s] : On a tendance à normaliser des signaux qui sont pourtant clairs. Le ventre sensible après chaque repas, les selles irrégulières, les articulations un peu raides après la sieste — on se dit que c'est son âge, sa race, sa nature. Mais en fait, le système digestif du chien est pas conçu pour absorber tout ce qu'on lui met dans la gamelle. Et quand la digestion fonctionne mal, c'est tout l'organisme qui en prend un coup : absorption des nutriments en baisse, inflammation qui s'installe, immunité qui suit. Le problème c'est que les croquettes, même de qualité, elles ne compensent pas ça. Elles ne sont pas faites pour ça. Et les compléments qu'on trouve partout, t'as pas moyen de savoir ce qu'il y a dedans vraiment — les dosages sont flous, les ingrédients illisibles. Jacqueline's Lab c'est parti de cette frustration-là. Deux propriétaires qui voulaient quelque chose de sérieux. Formulé avec des vétérinaires nutritionnistes, fabriqué en Europe dans un labo certifié, avec des dosages affichés pour de vrai. La formule Digestion, c'est pensé spécifiquement pour les ventres sensibles. Pas un produit générique — une réponse à un problème précis.
+
+[CTA] : Si ton chien a le ventre fragile ou que tu veux juste comprendre ce qui lui correspond, le quiz sur le site prend deux minutes et te donne une recommandation personnalisée.
+
+[DURÉE] : ~42 secondes
+
+[FORCE] : Ancre le script dans des comportements quotidiens que le propriétaire reconnaît immédiatement ("ça c'est mon chien"), transformant des signaux banalisés en problème réel — le produit arrive comme une évidence.
+
+---
+
+---
+**VARIANTE 3**
+[HOOK 0-3s] : "La plupart des compléments pour chiens affichent des ingrédients que même un vétérinaire aurait du mal à lire. Et personne n'en parle."
+
+[CORPS 3-30s] : Regarde l'étiquette d'un complément classique. T'as des noms en latin, des pourcentages sans contexte, zéro indication sur les dosages réels. Ce qui veut dire que tu donnes quelque chose à ton chien tous les jours sans vraiment savoir si la dose est suffisante, excessive, ou simplement inutile. Et le truc c'est que les fabricants le savent. L'étiquette floue, c'est pas un accident — c'est pratique pour mettre un peu de tout sans être tenu à des résultats. Résultat : des produits qui coutent cher, des chiens qui continuent à avoir les mêmes problèmes, et toi tu continues d'espérer que ça marche. On est partis de là. On a passé plus d'un an avec des vétérinaires nutritionnistes à construire des formules où chaque ingrédient a une raison d'être et un dosage lisible. Trois formules — Digestion, Mobilité, Multivitamines — fabriquées en Europe dans un labo certifié GMP+. Pas pour tous les chiens en même temps. Pour le tien, selon ce dont il a besoin maintenant.
+
+[CTA] : Si tu veux savoir exactement ce qui correspond à ton chien, y'a un quiz rapide sur le site — quatre questions et on t'envoie la recommandation directement.
+
+[DURÉE] : ~40 secondes
+
+[FORCE] : Attaque le marché concurrent avant d'attaquer le problème — crée de la méfiance envers les alternatives existantes et positionne la marque sur la transparence comme différenciateur crédible, pas émotionnel.
+
+---
+
+---
+
+## ✨ Transformation (2/7)
+*Avant / après — le voyage de la douleur à la solution*
+
+---
+**VARIANTE 1**
+[HOOK 0-3s] : "Mon chien avait l'air en forme. Jusqu'au jour où le véto m'a dit que non."
+
+[CORPS 3-30s] : "J'avais l'impression de bien faire les choses. Je lui donnais à manger, on se baladait, il avait l'air heureux. Sauf que petit à petit j'ai commencé à remarquer des trucs. Il se levait plus lentement le matin. Ses selles c'était le chaos. Il était moins enthousiaste pour jouer. Et moi je me disais 'bah c'est l'âge'. Mais c'est pas l'âge. C'est ce qu'il mange — ou plutôt ce qu'il manque dans ce qu'il mange. Le problème avec les croquettes classiques, c'est qu'elles remplissent la gamelle mais pas vraiment les besoins. Pas de soutien articulaire. Pas de probiotiques pour la digestion. Aucun dosage clair sur rien. J'ai cherché des compléments, j'ai regardé les étiquettes — et franchement c'était illisible. Des noms latins, des dosages inexistants, zéro transparence. Jusqu'à ce que je tombe sur des soft chews formulés par des vétérinaires nutritionnistes. Trois formules ciblées : digestion, mobilité, multivitamines. Les ingrédients sont lisibles, les dosages affichés clairement. Et mon chien les mange directement dans la main — pas besoin de les planquer dans sa gamelle. En trois semaines, il se relevait plus pareil le matin."
+
+[CTA] : "Si tu veux savoir quelle formule correspond à ton chien, y'a un petit quiz de 4 questions sur le site — ils t'envoient une recommandation personnalisée directement."
+
+[DURÉE] : ~45 secondes
+
+[FORCE] : Le hook joue sur la culpabilité silencieuse du propriétaire attentionné — universel et immédiat, il touche avant même que le produit existe dans le script.
+
+---
+
+---
+**VARIANTE 2**
+[HOOK 0-3s] : "Il grognait quand je lui touchais les hanches. J'avais mis ça sur le compte du caractère."
+
+[CORPS 3-30s] : "Cinq ans que j'ai Luna. Et honnêtement j'ai jamais vraiment réfléchi à ses articulations. Elle courait, elle sautait, ça avait l'air d'aller. Mais y'a quelques mois elle a commencé à éviter les escaliers. Alors j'ai cherché des solutions. Et c'est là que j'ai réalisé à quel point le marché des compléments pour chiens c'est le far west. Des produits avec des promesses partout et des ingrédients introuvables. Des dosages flous. 'Complexe breveté exclusif' — ok mais en quelle quantité ? Aucune idée. Ce que je voulais c'était simple : savoir exactement ce que j'allais lui donner, et pourquoi. J'ai trouvé une formule Mobilité, développée avec des vétérinaires nutritionnistes. Chaque ingrédient listé, chaque dosage affiché. Glucosamine, chondroïtine, oméga-3 — pas des noms en l'air, des concentrations précises avec un mécanisme qui a du sens. Et la forme, des petites chews moelleuses. Luna les attrape avant même que j'aie fini de les sortir du pot. Quatre semaines plus tard, elle remonte les escaliers."
+
+[CTA] : "Si ta chienne ressemble à Luna, t'as qu'à aller voir la formule Mobilité sur le site — tout est détaillé, ingrédient par ingrédient."
+
+[DURÉE] : ~48 secondes
+
+[FORCE] : Cette variante cible l'angle "méfiance du marché" — elle valide le scepticisme du spectateur avant de proposer une solution, ce qui crédibilise le produit sans avoir à forcer.
+
+---
+
+---
+**VARIANTE 3**
+[HOOK 0-3s] : "Mon chien pétait. Beaucoup. Ses selles c'était jamais pareil deux jours de suite. Et moi je pensais que c'était normal."
+
+[CORPS 3-30s] : "Spoiler : c'est pas normal. Un chien avec une digestion qui fonctionne bien, tu le remarques pas parce que tout se passe bien. Moi j'avais normalisé le chaos — les gaz, les selles molles, la fatigue après les repas. J'ai essayé de changer les croquettes. Ça a rien changé. J'ai essayé un probiotique trouvé en animalerie, dosage introuvable sur l'emballage, aucune idée de ce que je lui donnais vraiment. Le truc c'est que la digestion c'est pas juste un détail de confort. Quand l'intestin fonctionne mal, les nutriments passent moins bien. L'énergie suit pas. Le pelage terne, les petites inflammations chroniques — tout ça peut partir de là. Donc quand j'ai trouvé une formule Digestion spécifiquement conçue pour les ventres sensibles, avec des probiotiques, des prébiotiques et de la glutamine à des dosages clairs, j'ai essayé. Formulée avec des vétos nutritionnistes, fabriquée en Europe dans un labo certifié. Pas du marketing — une vraie formule lisible. En moins d'un mois, plus de gaz. Des selles régulières. Et un chien globalement plus tonique."
+
+[CTA] : "Si ton chien a le ventre fragile, ça vaut vraiment le coup d'aller regarder la formule Digestion — si ça t'intéresse y'a aussi un quiz qui te donne une reco personnalisée en deux minutes."
+
+[DURÉE] : ~52 secondes
+
+[FORCE] : Le hook est volontairement cru et concret — il filtre naturellement les propriétaires concernés et crée une reconnaissance immédiate qui rend le reste du script impossible à ignorer.
+
+---
+
+---
+
+## 💬 Preuve sociale (3/7)
+*Témoignage authentique à la 1ère personne*
+
+---
+**VARIANTE 1**
+[HOOK 0-3s] : "Mon chien avait l'air en forme. Et pourtant il souffrait en silence depuis des mois."
+
+[CORPS 3-30s] : J'aurais aimé que quelqu'un me dise ça plus tôt. Un chien qui ralentit dans les escaliers, qui mange moins bien, qui se lève avec du mal le matin — on appelle ça "vieillir normalement". Moi j'ai cru ça pendant deux ans. Jusqu'au jour où le véto m'a dit que ses articulations étaient déjà bien abîmées. J'ai commencé à chercher quelque chose de sérieux — pas une poudre floue avec une étiquette illisible. Je suis tombée sur des soft chews formulées avec des vétérinaires nutritionnistes, les ingrédients affichés clairement, les dosages précis selon son poids. Au bout de trois semaines, il remontait les escaliers seul le matin. Je ne dis pas que c'est magique — je dis que j'aurais dû commencer bien avant.
+
+[CTA] : Si ton chien commence à ralentir lui aussi, t'as qu'à faire le petit quiz sur leur site — ils t'envoient une recommandation faite pour lui spécifiquement, pas pour tous les chiens.
+
+[DURÉE] : 45 secondes
+
+[FORCE] : Le regret déclenche l'identification immédiate chez tout propriétaire qui a normalisé les signaux de vieillissement de son chien.
+
+---
+**VARIANTE 2**
+[HOOK 0-3s] : "Depuis que mon chien prend ça le matin, il finit son bol en entier. Pour la première fois depuis un an."
+
+[CORPS 3-30s] : Lupo avait le ventre sensible depuis qu'il était petit. Selles molles, ballonnements, il mangeait à moitié et laissait le reste. J'ai essayé trois croquettes différentes, deux compléments achetés en grande surface. Rien. Ce qui a changé, c'est quand j'ai compris que son problème venait pas de ce qu'il mangeait mais de sa digestion elle-même — son intestin ne traitait pas bien ce qu'il recevait. Les soft chews digestion que j'ai trouvées ont des ingrédients que je peux lire un par un, formulés avec des vétérinaires nutritionnistes. Pas un ingrédient mystère. Trois semaines plus tard, il finit son bol. Il réclame même. Ça fait un an que j'attendais ça.
+
+[CTA] : Si ton chien a le ventre capricieux, ça vaut vraiment le coup d'aller voir — ils ont un quiz rapide pour trouver exactement ce dont il a besoin.
+
+[DURÉE] : 42 secondes
+
+[FORCE] : Le résultat concret et chiffré dans le temps ("un an que j'attendais ça") donne une crédibilité immédiate au témoignage.
+
+---
+**VARIANTE 3**
+[HOOK 0-3s] : "J'ai mis trois ans à comprendre pourquoi mon chien n'était jamais vraiment en forme malgré tout ce que je faisais."
+
+[CORPS 3-30s] : Bonne nourriture, sorties régulières, véto à jour. Sur le papier, je faisais tout bien. Mais il était toujours un peu terne. Pelage pas terrible, énergie en dents de scie, humeur changeante. Ce que personne m'avait dit, c'est qu'un chien qui mange bien peut quand même manquer de certains micronutriments essentiels — parce que ses besoins changent avec l'âge et que les croquettes seules ne couvrent pas tout. Depuis qu'il prend les multivitamines — une à deux soft chews par jour selon son poids — en quatre semaines son pelage a changé, il est plus partant pour les balades, il dort mieux. Je le connais depuis six ans, je sais que c'est pas dans ma tête. Le truc qui m'a convaincue c'est de pouvoir lire chaque ingrédient, voir les dosages affichés. Pas une étiquette avec juste "complexe vitaminé".
+
+[CTA] : Si t'as l'impression que ton chien pourrait aller mieux sans que tu saches vraiment pourquoi pas, je te laisse aller faire leur quiz — c'est quatre questions et ils te disent ce qui lui correspond vraiment.
+
+[DURÉE] : 50 secondes
+
+[FORCE] : Elle parle au propriétaire "consciencieux mais perplexe" — celui qui fait bien les choses et ne comprend pas pourquoi son chien reste en deçà — c'est le profil le plus fréquent et le plus frustré.
+
+---
+
+## 🎯 Problème articulé (4/7)
+*Décrit le problème mieux que le client lui-même*
+
+---
+**VARIANTE 1**
+[HOOK 0-3s] : Mon chien avait l'air en forme. Et c'est exactement ce qui m'inquiétait.
+
+[CORPS 3-30s] : Parce qu'en fait, il mangeait bien. Il se levait le matin. Il aboyait encore sur le facteur. Mais il y avait des trucs tout petits que je me disais "bah c'est l'âge"... Il mettait plus longtemps à se lever du canapé. Il finissait pas toujours sa gamelle. Des fois il avait le ventre qui gargouillait la nuit. Rien de grave. Rien qui mérite le véto en urgence. Mais ça s'accumule, ces petits trucs. Et à un moment je me suis dit — attends, est-ce que je fais vraiment quelque chose pour lui, ou est-ce que j'attends que ça devienne un problème pour réagir ? C'est là que je suis tombée sur Jacqueline's Lab. Pas une marque avec des emballages flashy et des promesses floues. Une formule construite avec des vétérinaires nutritionnistes, ingrédient par ingrédient, pour un besoin précis. Y'a une formule Mobilité, une Digestion, une Multivitamines. Pas un truc générique pour "tous les chiens". En 3-4 semaines, j'ai vu la différence. Lui se levait plus facilement. Sa digestion s'est calmée. Et moi j'avais arrêté de culpabiliser.
+
+[CTA] : Si t'es dans le même état d'esprit que moi — t'attends pas que ça aille mal — t'as qu'à faire le petit quiz sur leur site, ils te recommandent la formule qui correspond vraiment à ton chien.
+
+[DURÉE] : 45 secondes
+
+[FORCE] : Le hook crée une tension émotionnelle paradoxale ("en forme mais inquiet") qui résonne profondément avec tout proprio attentif — et le script transforme des micro-signaux vagues en prise de conscience claire avant de poser le produit comme conclusion logique.
+
+---
+
+---
+**VARIANTE 2**
+[HOOK 0-3s] : Y'a des signes que ton chien t'envoie depuis des mois. Et t'as appris à ne plus les voir.
+
+[CORPS 3-30s] : Le matin, il se lève avec un petit temps de retard. Pas suffisant pour s'alarmer. Il se gratte de temps en temps. Il a parfois le ventre fragile après les repas. Il est moins partant pour courir que l'année dernière. Chaque truc pris séparément — c'est rien. Mais mets-les bout à bout et ça dit quelque chose. Ça dit que son corps compense. Que quelque chose ne tourne pas à 100%. Et le problème, c'est qu'on a été conditionnés à n'agir qu'en cas de crise. Alors on attend. On se dit "ça va aller". Et pendant ce temps, ça s'installe. Ce que j'aurais voulu savoir plus tôt, c'est qu'il existe des compléments formulés spécifiquement pour ça — pas pour soigner, mais pour soutenir, en amont, avant que ça devienne un vrai sujet. Jacqueline's Lab c'est exactement ça. Trois formules — Digestion, Mobilité, Multivitamines — chacune pensée pour un besoin précis, avec des dosages clairs, des ingrédients lisibles, co-construits avec des vétérinaires nutritionnistes. Pas une pilule planquée dans la gamelle. Des soft chews qu'ils avalent avant même que t'aies fini de les sortir du pot.
+
+[CTA] : Si tu viens de te reconnaître dans un de ces signes, leur site a un quiz de 4 questions qui t'oriente vers la bonne formule pour ton chien spécifiquement.
+
+[DURÉE] : 50 secondes
+
+[FORCE] : La liste de micro-symptômes banalisés crée un effet miroir ultra-précis — le spectateur passe de "c'est rien" à "en fait si, c'est quelque chose" sans qu'on ait forcé, ce qui rend la solution naturellement désirable.
+
+---
+
+---
+**VARIANTE 3**
+[HOOK 0-3s] : Je regardais les ingrédients des compléments pour chiens. Et j'ai refermé le pot.
+
+[CORPS 3-30s] : T'as déjà essayé de lire l'étiquette d'un complément pour chien ? C'est soit illisible, soit vide de sens. Des noms de molécules, aucun dosage indiqué, "formule brevetée" — mais brevetée pour faire quoi exactement, mystère. Et moi j'avais un chien avec un ventre sensible. Il digérait mal certains repas. Il avait des selles irrégulières. Rien d'urgent, mais suffisamment présent pour que je cherche quelque chose. Sauf que je voulais pas lui donner n'importe quoi juste parce que l'emballage était sympa. Je voulais savoir ce qu'il allait avaler, pourquoi, et à quelle dose. C'est exactement l'approche de Jacqueline's Lab. Fabriqué en Europe dans un labo certifié, chaque ingrédient est affiché avec son dosage, et y'a trois formules distinctes — Digestion, Mobilité, Multivitamines — parce qu'un chien qui a un ventre fragile n'a pas les mêmes besoins qu'un chien qui commence à avoir les articulations raides. En 3 semaines, la digestion de mon chien s'est vraiment stabilisée. Et moi j'avais enfin l'impression de faire quelque chose de concret pour lui, pas juste de cocher une case.
+
+[CTA] : Si toi aussi t'en as marre de pas comprendre ce que tu donnes à ton chien, t'as qu'à aller voir leur site — y'a un quiz court qui t'aide à trouver la formule qui lui correspond vraiment.
+
+[DURÉE] : 48 secondes
+
+[FORCE] : Ce script attaque par la frustration liée à l'opacité des labels — un point de douleur fort chez les proprios conscients — et positionne la transparence des ingrédients comme bénéfice principal, différenciant le produit sans jamais l'imposer.
+
+---
+
+---
+
+## 🎬 Behind-the-scenes (5/7)
+*Coulisses authentiques — proof of concept accidentel*
+
+# 3 Scripts UGC — Angle Behind-the-Scenes · Jacqueline's Lab
+
+---
+
+**VARIANTE 1**
+[HOOK 0-3s] : *(Personne filmée de dos, dans sa cuisine, en train de scruter l'étiquette d'un pot de compléments pour chien avec une lampe torche de téléphone)* — voix off : *"Attends, c'est quoi exactement ce truc que je lui donne depuis 6 mois ?"*
+
+[CORPS 3-30s] : C'est la question que je me suis posée un soir en regardant le pot qu'on achetait depuis... longtemps. Et j'ai pas réussi à répondre. Les ingrédients, y'en avait genre 40, aucun dosage affiché, juste des noms qui sonnent bien. *(coupe — plan sur téléphone ouvert sur le site Jacqueline's Lab)* Alors j'ai cherché une alternative et je suis tombé là-dessus. Ce qui m'a arrêté direct, c'est qu'ils affichent chaque ingrédient avec son dosage exact. Tu lis, tu comprends. *(plan rapproché sur le pot, doigt qui pointe les ingrédients un à un)* Probiotiques, psyllium, curcuma... et en face de chaque truc, la quantité réelle. Pas "complexe digestif breveté", pas de formule floue. Juste ce qu'il y a dedans et pourquoi. *(plan sur le chien qui croque la soft chew sans hésiter)* Et ce que je peux te dire c'est que depuis 3 semaines, ses selles sont... franchement beaucoup plus régulières. Lui il s'en fout du marketing, il retient juste que c'est bon.
+
+[CTA] : Si t'es comme moi et que t'as jamais vraiment su ce que tu donnais à ton chien, tu peux aller voir leur site — ils ont un quiz de 4 questions qui te dit quelle formule correspond vraiment à lui.
+
+[DURÉE] : 38 secondes
+
+[FORCE] : Le hook joue sur la culpabilité discrète du propriétaire consciencieux — il se reconnaît avant même que le produit apparaisse.
+
+---
+
+**VARIANTE 2**
+[HOOK 0-3s] : *(Plan caméra tremblante, filmé à la main sur un canapé, ton confidentiel)* — *"Je vais te montrer pourquoi j'ai jeté l'ancien pot."*
+
+[CORPS 3-30s] : Nala a 7 ans. Depuis deux ans, elle se lève le matin avec les pattes raides. Elle prend son temps pour descendre du canapé, elle hésite avant les escaliers. Le véto nous a dit que c'était l'âge. OK. Mais l'âge ça s'accompagne, non ? *(coupe — main qui tient deux pots côte à côte)* L'ancien complément qu'on lui donnait — je l'ai retourné dans tous les sens. Aucun dosage. Une liste d'ingrédients qui ressemble à un exposé de chimie. Et le prix était pas donné non plus. *(coupe — plan sur les mains qui ouvrent le nouveau pot Jacqueline's Lab, odeur mimée, sourire)* Celui-là je l'ai commandé parce qu'un des fondateurs expliquait que c'est parti de leur propre chien. Et quand t'as passé un an avec des vétérinaires nutritionnistes à construire une formule mobilité avec de la boswellia, du collagène de type II, de l'oméga-3... tu l'affiches. Tu te caches pas derrière un nom fantaisie. *(plan sur Nala qui se lève du canapé, fluide, sans hésitation)* Ça fait 4 semaines. Je filme pas pour faire le buzz. Je filme parce que j'aurais voulu voir cette vidéo avant.
+
+[CTA] : Si ton chien commence à vieillir et que tu cherches quelque chose de sérieux, leur formule Mobilité — t'as qu'à aller regarder les ingrédients toi-même, c'est tout affiché.
+
+[DURÉE] : 42 secondes
+
+[FORCE] : Le "je filme pas pour faire le buzz" désarme la méfiance UGC et renforce la crédibilité du témoignage — l'authenticité est nommée, pas jouée.
+
+---
+
+**VARIANTE 3**
+[HOOK 0-3s] : *(Plan POV — mains qui tiennent un téléphone avec une conversation WhatsApp ouverte, on lit "mais t'es sûre que c'est pas des conneries ?" avant que la personne lève les yeux caméra)* — *"Même mes amis me demandaient si je m'étais fait avoir."*
+
+[CORPS 3-30s] : Honnêtement, au début moi aussi j'étais sceptique. Les compléments pour chien c'est un peu le far-west — tout le monde promet tout, personne explique rien. *(coupe — plan sur un écran d'ordinateur portable, navigation sur la page ingrédients du site)* Ce qui m'a convaincu c'est pas la pub. C'est que quand j'ai voulu creuser — les ingrédients, les dosages, d'où c'est fabriqué — tout était là. Fabriqué en Europe, certifié GMP+, formulé avec des vétos nutritionnistes. C'est le genre de détails que les marques bidons mettent pas en avant parce qu'ils ont pas à le mettre. *(coupe — plan cuisine, routine du matin : café qui coule, main qui ouvre le pot, une soft chew posée dans la gamelle, chien qui arrive en trottinant)* Et là c'est devenu un truc banal du matin. Une chew par jour pour Pixel parce qu'il fait 9 kilos. Lui il croit que c'est une récompense. *(sourire)* En vrai techniquement c'en est une. *(plan sur les crottes du chien — montré brièvement, ton humoristique)* Bon. Ses selles ont l'air d'accord aussi.
+
+[CTA] : Si tu veux pas faire confiance juste à ma parole, leur site est hyper transparent — tu peux vérifier chaque ingrédient avant même de commander.
+
+[DURÉE] : 40 secondes
+
+[FORCE] : L'objection "c'est des conneries" est posée dès le hook par une tierce personne — le script démine la méfiance en transformant la vérification en preuve, pas en argument.
+
+---
+
+---
+
+## ⚡ Pattern Interrupt (6/7)
+*Accroche contre-intuitive ou choc visuel*
+
+---
+**VARIANTE 1**
+[HOOK 0-3s] : "Arrête de croire que ton chien mange bien juste parce qu'il finit sa gamelle."
+
+[CORPS 3-30s] : Un chien qui finit son bol, ça veut rien dire. Les croquettes de supermarché, elles sont formulées pour être irrésistibles — comme les chips pour nous. Ça n'a rien à voir avec ce que son corps a vraiment besoin. Et le truc c'est que les carences, l'articulation qui commence à craquer, la digestion qui déraille... ça se voit pas tout de suite. Ça s'installe doucement, sur des mois, des années. Le temps que tu remarques quelque chose, ça fait longtemps que c'est là. C'est exactement pour ça que deux proprio de chiens — frustrés de trouver que des étiquettes illisibles en animalerie — ont bossé pendant plus d'un an avec des vétérinaires nutritionnistes pour créer des compléments simples : digestion, mobilité, vitamines. Un besoin précis, une formule dédiée. Des soft chews qu'ils avalent tout seuls, avec des effets visibles en 3 à 4 semaines. Tu sais exactement ce qu'il y a dedans — chaque ingrédient, chaque dosage, affiché clairement.
+
+[CTA] : Si tu veux savoir quelle formule correspond vraiment à ton chien, y'a un quiz de 4 questions sur le site — et tu reçois une reco personnalisée dans ta boîte mail.
+
+[DURÉE] : ~45 secondes
+
+[FORCE] : Retourne une croyance rassurante que presque tous les propriétaires ont, crée une inquiétude légitime basée sur un mécanisme réel (palatabilité des croquettes ≠ valeur nutritive), et positionne le produit comme la réponse logique à une négligence involontaire.
+
+---
+
+---
+**VARIANTE 2**
+[HOOK 0-3s] : "Ce que tu crois être du 'vieillissement normal' chez ton chien... c'est souvent pas normal du tout."
+
+[CORPS 3-30s] : Il se lève plus lentement le matin. Il joue moins longtemps qu'avant. T'as peut-être pensé — c'est son âge, c'est comme ça. Mais en fait, beaucoup de ces signaux-là, c'est pas de la fatalité. C'est le signe que son corps manque de quelque chose depuis un moment. Les articulations qui raidissent, la digestion capricieuse, la fatigue qui arrive tôt — c'est des mécanismes que t'as moyen d'accompagner, si tu t'y prends avant que ça devienne un problème. Le souci c'est que la plupart des compléments sur le marché, t'arrives pas à savoir ce qu'il y a vraiment dedans. Dosages flous, ingrédients incompréhensibles. Alors deux propriétaires ont décidé de faire les choses autrement. Avec des vétos nutritionnistes, ils ont créé trois formules — mobilité, digestion, multivitamines — où chaque ingrédient est lisible, chaque dosage est affiché. Fabriqué en Europe, certifié GMP+. Pas de raccourci. Juste ce dont son corps a besoin, en soft chews qu'il prend tout seul.
+
+[CTA] : Si ton chien commence à montrer ces signaux-là, ça vaut le coup de jeter un œil — y'a un quiz sur le site qui t'aide à trouver ce qui lui correspond.
+
+[DURÉE] : ~50 secondes
+
+[FORCE] : Attaque la résignation parentale ("c'est son âge") qui est une croyance ultra-répandue, transforme une passivité émotionnelle en opportunité d'action concrète, et la preuve (vétérinaires, GMP+, dosages visibles) arrive au moment où la confiance doit être gagnée.
+
+---
+
+---
+**VARIANTE 3**
+[HOOK 0-3s] : "Donner des friandises à ton chien tous les jours, c'est pas du tout pareil que lui donner un complément. Et pourtant t'es peut-être en train de confondre les deux."
+
+[CORPS 3-30s] : Y'a des tas de produits en animalerie qui ressemblent à des soins, qui se vendent comme des soins — mais qui sont formulés comme des snacks. Du sucre, des arômes, des actifs en quantité homéopathique. Juste assez pour que ça soit écrit sur l'emballage. Résultat : t'as l'impression de prendre soin de lui, mais son corps reçoit pas grand-chose. Et c'est pas une question de bonne volonté — c'est juste que les étiquettes sont conçues pour pas qu'on comprenne. La vraie différence, elle est dans les dosages. Un complément qui fonctionne, t'as les actifs en quantité suffisante, et tu peux le vérifier toi-même. C'est justement ce que deux propriétaires ont voulu régler — ils ont bossé avec des vétérinaires nutritionnistes pour créer des formules où tout est lisible : chaque ingrédient, chaque dosage. Digestion, mobilité, vitamines. Un besoin, une formule. Des soft chews, un à trois par jour selon le poids, et des effets visibles en 3 à 4 semaines.
+
+[CTA] : Si t'as envie de comprendre exactement ce que tu lui donnes, leur site détaille tout ingrédient par ingrédient — et y'a un quiz pour savoir ce qui lui correspond vraiment.
+
+[DURÉE] : ~48 secondes
+
+[FORCE] : Exploite une confusion réelle et répandue (friandises "santé" vs vrais compléments), crée un sentiment de manipulation subie (pas de culpabilité mais de trahison par le marché), et positionne la transparence des dosages comme preuve concrète et différenciante — un argument rationnel pour une audience froide qui ne fait pas encore confiance.
+
+---
+
+---
+
+## 👁 POV / Identification (7/7)
+*Le spectateur EST le personnage — immersion totale*
+
+# 3 SCRIPTS UGC — JACQUELINE'S LAB
+### Angle : POV / Identification | Audience froide
+
+---
+
+**VARIANTE 1**
+[HOOK 0-3s] : *"POV : ton chien vieillit et tu te rends compte que t'as jamais vraiment fait gaffe à ce qu'il mange."*
+
+[CORPS 3-30s] : C'est bizarre ce truc. On va chez le médecin une fois par an, on lit les étiquettes pour nous-mêmes, on fait attention... et pour notre chien ? On achète les croquettes au rayon promo et on espère que ça ira.
+
+Moi c'est exactement ce que j'ai fait pendant des années. Jusqu'au jour où j'ai commencé à voir que le mien se levait plus aussi vite le matin. Qu'il hésitait avant de sauter dans la voiture. Des petites choses. Rien d'alarmant. Mais qui s'accumulent.
+
+Et là tu te poses la question — est-ce que j'ai raté quelque chose ? Est-ce que j'aurais pu faire quelque chose avant ?
+
+C'est exactement pour ça que j'ai commencé à chercher quelque chose de sérieux. Pas des friandises déguisées en complément. Pas une formule générique avec des ingrédients illisibles. Quelque chose de formulé avec des vétérinaires nutritionnistes, avec des dosages affichés clairement, que je comprends moi-même.
+
+Ce que j'ai trouvé, c'est des soft chews — une par jour pour lui selon son poids — avec des ingrédients fabriqués en Europe, dans un labo certifié. Et en trois semaines, les petites hésitations du matin... elles ont commencé à disparaître.
+
+[CTA] : Si toi aussi tu te poses ces questions-là, t'as qu'à cliquer, y'a un petit questionnaire de 4 questions et ils te recommandent exactement ce dont ton chien a besoin.
+
+[DURÉE] : ~45 secondes
+
+[FORCE] : Joue sur la culpabilité douce et universelle du "bon propriétaire qui réalise trop tard" — identification immédiate sans agression.
+
+---
+
+**VARIANTE 2**
+[HOOK 0-3s] : *"Si ton chien a le ventre qui gargouille, des selles molles ou qu'il mange de l'herbe... c'est pas anodin."*
+
+[CORPS 3-30s] : Pendant longtemps j'ai cru que c'était normal. Que certains chiens avaient juste un ventre sensible. Que c'était dans sa nature.
+
+Et en fait non. Un ventre qui réagit comme ça, c'est souvent la façon qu'a ton chien de te dire que ce qu'il ingère, son système il arrive pas à le traiter correctement. Sauf qu'il peut pas te le dire autrement.
+
+Le problème c'est que la plupart des compléments que j'avais essayés ? Les ingrédients t'en connais pas la moitié. Les dosages sont pas affichés. Tu sais pas vraiment ce que tu lui donnes. Tu fais confiance à un emballage.
+
+Alors quand j'ai découvert qu'il existait une formule Digestion — pensée spécifiquement pour les ventres sensibles, construite avec des vétérinaires nutritionnistes, avec chaque ingrédient listé et son dosage visible — j'ai voulu tester.
+
+C'est des petits chews mous. Il les prend pour une friandise. Et en moins d'un mois, les matins calmes sont redevenus la norme.
+
+[CTA] : Si ton chien fait partie de ceux qui ont le ventre fragile, ça vaut le coup de regarder — le lien est en bas, y'a un quiz rapide pour voir si c'est fait pour lui.
+
+[DURÉE] : ~40 secondes
+
+[FORCE] : Transforme un symptôme "banal et accepté" en signal d'alerte — crée le déclic cognitif chez les propriétaires qui ont normalisé le problème.
+
+---
+
+**VARIANTE 3**
+[HOOK 0-3s] : *"POV : tu réalises que tu connais mieux la composition de ton yaourt du matin que ce que mange ton chien tous les jours."*
+
+[CORPS 3-30s] : Sérieusement. Prends n'importe quel pot de croquettes ou de complément pour chien. Lis l'étiquette. T'es capable de te représenter ce que c'est, toi ?
+
+Moi non. Et ça m'a commencé à me déranger.
+
+Parce qu'on parle d'un truc qu'il avale chaque jour de sa vie. Et moi j'avais aucune idée de ce que je lui mettais dans le corps.
+
+Ce que j'ai cherché, c'était simple : quelque chose où je peux lire chaque ingrédient et comprendre pourquoi il est là. Avec des dosages réels, pas des "complexe breveté" en quantité non précisée. Et formulé par des gens qui s'y connaissent — des vétérinaires nutritionnistes, pas un service marketing.
+
+J'ai trouvé trois formules — Digestion, Mobilité, Multivitamines. Chacune cible un truc précis. Fabriqué en Europe dans un labo certifié GMP+. Et franchement, pour la première fois, j'ai l'impression de savoir ce que je donne à mon chien.
+
+Il les mange en 3 secondes de toute façon. Mais là au moins, je sais ce que c'est ces 3 secondes.
+
+[CTA] : Si ça t'intéresse, y'a 4 questions sur leur site pour trouver ce qui correspond vraiment à ton chien — pas une formule au hasard, une recommandation faite pour lui.
+
+[DURÉE] : ~42 secondes
+
+[FORCE] : Retourne la vigilance que le propriétaire a pour lui-même contre l'angle mort évident — son chien — sans jugement, avec curiosité.
+
+---
+
+---
+
+
+## 📊 Scores des scripts générés
+*Même grille d'évaluation que tes pubs scrapées — les scores sont directement comparables.*
+
+| Angle | Var. | 🏆 Total | Hook | Clarté | Mots | Structure | Verdict |
+|---|---|---|---|---|---|---|---|
+| 🎓 Éducatif | V1 | **9.1** | 9 | 9 | 9 | 9 | Excellent. Hook contre-intuitif accroche, éducation claire, CTA précis. |
+| 🎓 Éducatif | V2 | **8.1** | 7 | 9 | 9 | 9 | Excellent texte éducatif, hook symptomatique fort mais non-percutant filmiquement. |
+| 🎓 Éducatif | V3 | **9.2** | 9 | 9 | 9 | 9 | Script excellent. Hook problème incarné, éducation fluide, CTA précis. |
+| ✨ Transformation | V1 | **9.1** | 9 | 9 | 9 | 9 | Script primé. Hook irrésistible, éducation fluide, CTA smart. |
+| ✨ Transformation | V2 | **9.1** | 9 | 9 | 9 | 9 | Script quasi parfait. Hook viscéral, éducation claire, preuve vivante. |
+| ✨ Transformation | V3 | **9.1** | 9 | 9 | 9 | 9 | Script exemplaire. Hook viscéral, mécanique claire, preuve crédible. |
+| 💬 Preuve sociale | V1 | **8.4** | 8 | 9 | 9 | 9 | Hook excellent. Éducatif solide. Manque preuve visuelle. |
+| 💬 Preuve sociale | V2 | **8.4** | 7 | 9 | 9 | 9 | Excellent. Hook légèrement indirect, éducation impeccable. |
+| 💬 Preuve sociale | V3 | **9.1** | 9 | 9 | 9 | 9 | Script quasi-parfait, authentique, éducatif, persuasif. |
+| 🎯 Problème articulé | V1 | **9.1** | 9 | 9 | 9 | 9 | Script exemplaire. Hook paradoxal irrésistible, éducation fluide. |
+| 🎯 Problème articulé | V2 | **9.0** | 8 | 9 | 9 | 9 | Script éducatif puissant, très aligné objectif. |
+| 🎯 Problème articulé | V3 | **7.8** | 7 | 9 | 9 | 9 | Éducatif fort, hook tardif, chien absent. |
+| 🎬 Behind-the-scenes | V1 | **7.5** | 7 | 8 | 9 | 8 | Fort educatif. Hook personnel, pas symptôme relatable universal. |
+| 🎬 Behind-the-scenes | V2 | **7.1** | 7 | 8 | 9 | 8 | Authentique et éduca, mais hook indirect—produit tardif. |
+| 🎬 Behind-the-scenes | V3 | **7.1** | 7 | 8 | 9 | 8 | Authentique mais hook faible, trop tardi à accrocher. |
+| ⚡ Pattern Interrupt | V1 | **9.2** | 9 | 9 | 9 | 9 | Hook percutant. Éducation biologique claire. Vente naturelle. |
+| ⚡ Pattern Interrupt | V2 | **8.4** | 8 | 9 | 9 | 9 | Excellent script éducatif, hook légèrement trop long. |
+| ⚡ Pattern Interrupt | V3 | **8.4** | 8 | 9 | 9 | 9 | Éducatif solide, manque hook visuel immédiat. |
+| 👁 POV / Identification | V1 | **9.1** | 9 | 9 | 9 | 9 | Hook stop-scroll parfait. Script gagnant à adapter. |
+| 👁 POV / Identification | V2 | **9.1** | 9 | 9 | 9 | 9 | Script référence. Hook irréductible, éducation pure. |
+| 👁 POV / Identification | V3 | **9.1** | 9 | 9 | 9 | 9 | Script parfait. Hook irrésistible, éducation fluide, authenticité complète. |
+
+**🥇 Meilleur score : 🎓 Éducatif V3 à 9.2/10**
+> « "La plupart des compléments pour chiens affichent des ingrédients que ... »
+
+## 🏆 Verdict — quoi tourner en premier
+
+# Classement media buyer — Budget limité, audience froide
+
+---
+
+## Top 3 scripts à tourner
+
+---
+
+### 🥉 #3 — Éducatif V3 (score 9.2)
+**Hook :** *"La plupart des compléments pour chiens affichent des ingrédients que même un vétérinaire aurait du mal à lire. Et personne n'en parle."*
+
+**Pourquoi il marche sur cette audience :**
+Il attaque la méfiance ambiante envers le marché entier — pas envers un problème de santé canine. Ça touche même les propriétaires qui n'ont PAS de problème visible avec leur chien. Le repositionnement par la transparence est un différenciateur durable, pas une promesse émotionnelle fragile.
+
+**Nuance media buyer :** Le score 9.2 est justifié mais ce script demande un spectateur qui a *déjà* acheté un complément. Sur audience vraiment froide, il performe moins bien que les deux suivants.
+
+---
+
+### 🥈 #2 — Pattern Interrupt V1 (score 9.2)
+**Hook :** *"Arrête de croire que ton chien mange bien juste parce qu'il finit sa gamelle."*
+
+**Pourquoi il marche sur cette audience :**
+Ce hook est une gifle propre. Il invalide une croyance que 100% des propriétaires ont — sans exception. La mécanique cause→effet (croquettes formulées pour être irrésistibles ≠ besoins réels) est concrète, vérifiable, éducative. Il construit le problème avant même que le propriétaire ait réalisé qu'il en avait un.
+
+**Nuance media buyer :** Le script est tronqué dans le deck — j'écarte pas ce problème, je le note. Si le closing est aussi propre que le corps, c'est le script le plus scalable des 21.
+
+---
+
+### 🥇 #1 — POV / Identification V2 (score 9.1)
+**Hook :** *(non affiché dans l'extrait — angle POV/Identification V2)*
+
+Je choisis ce slot pour une raison précise que le score seul ne capture pas.
+
+---
+
+## 🥇 À tourner en premier : POV / Identification V2
+
+**Pourquoi il bat les 9.2 dans la vraie vie :**
+
+Le format POV/Identification est le seul angle qui fait les trois choses simultanément que demande une audience froide :
+
+1. **Identification immédiate** — le spectateur se voit dans l'histoire avant de voir le produit
+2. **Construction du "pourquoi"** — le problème est vécu, pas expliqué. La douleur précède la solution de 70% du script
+3. **Crédibilité sans effort** — le format POV supprime la distance entre la pub et le témoignage réel
+
+Sur audience froide qui ne connaît ni la marque ni les bienfaits, un script éducatif bien structuré perd contre un script dans lequel le spectateur *se reconnaît physiquement* dès la seconde 2. La reconnaissance émotionnelle ouvre l'attention. L'éducation vient ensuite. Dans cet ordre — jamais l'inverse.
+
+Les angles Éducatif et Pattern Interrupt demandent au spectateur de **traiter une information**. Le POV lui demande de **reconnaître une situation**. Sur cold traffic, la reconnaissance bat le traitement.
+
+---
+
+## Conseil de production — POV / Identification V2
+
+**Casting :** Femme, 32-42 ans, look quotidien (pas influenceuse, pas trop apprêtée), filmée à la maison dans une pièce de vie réelle — canapé, lumière naturelle. Chien de taille moyenne visible mais pas en premier plan.
+
+**Lieu :** Salon ou cuisine — jamais un fond neutre ou une terrasse soignée. Le désordre maîtrisé crée la confiance.
+
+**Ton :** Voix normale, légèrement fatiguée, comme si elle racontait ça à une amie. Pas de sourire de pub. Pas de regard caméra forcé. Le moment où elle parle du produit doit sonner comme une découverte, pas comme un placement.
+
+**Détail concret qui fait la différence :** filmer le chien en train de prendre la soft chew directement dans la main — pas posée dans la gamelle. Ce plan à 3 secondes vaut tous les arguments de transparence du script.

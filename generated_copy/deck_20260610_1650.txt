@@ -1,0 +1,74 @@
+# 📝 Deck de Scripts — 7 angle(s) × 3 variantes
+
+*Basé sur 6 transcriptions scrapées · Audience : 🧊 Audience froide — ils ne nous connaissent pas*
+
+---
+
+## 🎓 Éducatif (1/7)
+*Révèle un problème méconnu que le client ne savait pas avoir*
+
+
+⚠ Erreur pour cet angle : Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CbumQDmeupREFGMwweA1a'}
+
+
+---
+
+## ✨ Transformation (2/7)
+*Avant / après — le voyage de la douleur à la solution*
+
+
+⚠ Erreur pour cet angle : Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CbumQEouzrMtFuB2bygGp'}
+
+
+---
+
+## 💬 Preuve sociale (3/7)
+*Témoignage authentique à la 1ère personne*
+
+
+⚠ Erreur pour cet angle : Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CbumQGFivAPqM7fTBMxxj'}
+
+
+---
+
+## 🎯 Problème articulé (4/7)
+*Décrit le problème mieux que le client lui-même*
+
+
+⚠ Erreur pour cet angle : Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CbumQHHVNVqiDGCTxrTV7'}
+
+
+---
+
+## 🎬 Behind-the-scenes (5/7)
+*Coulisses authentiques — proof of concept accidentel*
+
+
+⚠ Erreur pour cet angle : Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CbumQJNyRF473HUJb8DX7'}
+
+
+---
+
+## ⚡ Pattern Interrupt (6/7)
+*Accroche contre-intuitive ou choc visuel*
+
+
+⚠ Erreur pour cet angle : Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CbumQKn4XX58iurKYrSCe'}
+
+
+---
+
+## 👁 POV / Identification (7/7)
+*Le spectateur EST le personnage — immersion totale*
+
+
+⚠ Erreur pour cet angle : Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CbumQMJqCjzoF95bfgr7b'}
+
+
+---
+
+
+## 🏆 Verdict — quoi tourner en premier
+
+
+⚠ Erreur verdict : Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CbumQNxoHs5jwtebZ3HLN'}

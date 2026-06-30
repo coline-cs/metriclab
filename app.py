@@ -39,7 +39,7 @@ except ImportError:
 
 BRANDS_AVAILABLE = False
 try:
-    from brands import load_brands, save_brands, add_brand, remove_brand, update_brand_stats
+    from brands import load_brands, save_brands, add_brand, remove_brand, update_brand_stats, load_sections, save_sections, add_section, remove_section
     BRANDS_AVAILABLE = True
 except ImportError:
     pass
@@ -55,49 +55,92 @@ except ImportError:
 # CONFIG
 # ──────────────────────────────────────────────
 st.set_page_config(
-    page_title="Meta Ads Intelligence",
-    page_icon="📊",
+    page_title="metric lab",
+    page_icon="⬛",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;800;900&display=swap');
+
 /* ── Base ── */
 html, body, [data-testid="stAppViewContainer"] {
-    background: #f0f2f5 !important;
-    color: #1c1e21 !important;
+    background: #f5f5f5 !important;
+    color: #0a0a0a !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif !important;
 }
-[data-testid="stHeader"] { background: transparent !important; }
+[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
+[data-testid="stMainBlockContainer"] { padding-top: 0 !important; }
 
-/* ── Labels des inputs ── */
+/* ── Labels ── */
 label, .stTextInput label, .stTextArea label,
 .stSelectbox label, .stSlider label,
 div[data-testid="stWidgetLabel"] p,
 div[data-testid="stWidgetLabel"] {
-    color: #1c1e21 !important;
+    color: #0a0a0a !important;
     font-weight: 600 !important;
-    font-size: .92rem !important;
+    font-size: .88rem !important;
+    letter-spacing: .01em !important;
 }
 
-/* ── Champs de saisie ── */
+/* ── Inputs ── */
 input, textarea, .stTextInput input, .stTextArea textarea {
     background: #ffffff !important;
-    color: #1c1e21 !important;
-    border: 1.5px solid #d0d5dd !important;
-    border-radius: 8px !important;
+    color: #0a0a0a !important;
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 10px !important;
+    font-size: .9rem !important;
 }
 input:focus, textarea:focus {
-    border-color: #1877f2 !important;
-    box-shadow: 0 0 0 3px rgba(24,119,242,.15) !important;
+    border-color: #0a0a0a !important;
+    box-shadow: 0 0 0 3px rgba(10,10,10,.08) !important;
 }
-input::placeholder, textarea::placeholder { color: #9ca3af !important; }
+input::placeholder, textarea::placeholder { color: #b0b0b0 !important; }
 
 /* ── Selectbox ── */
 .stSelectbox div[data-baseweb="select"] > div {
     background: #ffffff !important;
-    color: #1c1e21 !important;
-    border: 1.5px solid #d0d5dd !important;
+    color: #0a0a0a !important;
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 10px !important;
+}
+
+/* ── Navigation principale ── */
+div[data-testid="stSegmentedControl"],
+div[data-testid="stButtonGroup"] {
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    padding: 5px 6px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04) !important;
+    gap: 2px !important;
+    overflow-x: auto !important;
+}
+div[data-testid="stSegmentedControl"] button,
+div[data-testid="stButtonGroup"] button {
+    border-radius: 9px !important;
+    font-weight: 500 !important;
+    font-size: .81rem !important;
+    border: none !important;
+    color: #666 !important;
+    background: transparent !important;
+    transition: all 0.12s ease !important;
+    white-space: nowrap !important;
+    padding: 6px 12px !important;
+}
+div[data-testid="stSegmentedControl"] button:hover,
+div[data-testid="stButtonGroup"] button:hover {
+    background: #f0f0f0 !important;
+    color: #0a0a0a !important;
+}
+div[data-testid="stSegmentedControl"] button[aria-checked="true"],
+div[data-testid="stButtonGroup"] button[aria-checked="true"],
+div[data-testid="stSegmentedControl"] button[kind="segmented_controlActive"],
+div[data-testid="stButtonGroup"] button[kind="segmented_controlActive"] {
+    background: #0a0a0a !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,.20) !important;
 }
 
 /* ── Onglets ── */
@@ -105,266 +148,216 @@ input::placeholder, textarea::placeholder { color: #9ca3af !important; }
     background: #ffffff !important;
     border-radius: 10px !important;
     padding: 4px !important;
-    box-shadow: 0 1px 4px rgba(0,0,0,.08) !important;
-    gap: 4px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.07) !important;
+    gap: 3px !important;
 }
 .stTabs [data-baseweb="tab"] {
     background: transparent !important;
-    color: #444 !important;
+    color: #666 !important;
     border-radius: 7px !important;
     font-weight: 500 !important;
-    padding: 8px 16px !important;
+    padding: 7px 14px !important;
 }
 .stTabs [aria-selected="true"] {
-    background: #1877f2 !important;
+    background: #0a0a0a !important;
     color: #ffffff !important;
 }
 
-/* ── Navigation principale (segmented control) ── */
-div[data-testid="stSegmentedControl"] {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 4px 6px;
-    box-shadow: 0 1px 6px rgba(0,0,0,.09);
-    gap: 2px !important;
-    overflow-x: auto;
-}
-div[data-testid="stSegmentedControl"] button,
-div[data-testid="stButtonGroup"] button {
-    border-radius: 8px !important;
-    font-weight: 500 !important;
-    font-size: .82rem !important;
-    border: none !important;
-    color: #5a5f6b !important;
-    background: transparent !important;
-    transition: all 0.15s ease !important;
-    white-space: nowrap !important;
-}
-div[data-testid="stSegmentedControl"] button:hover,
-div[data-testid="stButtonGroup"] button:hover {
-    background: #f0f4ff !important;
-    color: #1877f2 !important;
-}
-div[data-testid="stSegmentedControl"] button[aria-checked="true"],
-div[data-testid="stButtonGroup"] button[aria-checked="true"],
-div[data-testid="stSegmentedControl"] button[kind="segmented_controlActive"],
-div[data-testid="stButtonGroup"] button[kind="segmented_controlActive"] {
-    background: #1877f2 !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(24,119,242,.30) !important;
-}
-
-/* ── Download button ── */
-.stDownloadButton > button {
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    background: #f0f4ff !important;
-    color: #1877f2 !important;
-    border: 1.5px solid #1877f2 !important;
-    transition: all 0.15s ease !important;
-}
-.stDownloadButton > button:hover {
-    background: #1877f2 !important;
-    color: #fff !important;
-    transform: translateY(-1px) !important;
-}
-
-/* ── Expander ── */
-.streamlit-expanderHeader {
-    background: #ffffff !important;
-    color: #1c1e21 !important;
-    border: 1px solid #e4e6ea !important;
+/* ── Boutons primaires ── */
+.stButton > button {
     border-radius: 10px !important;
     font-weight: 600 !important;
-    transition: background 0.15s ease !important;
-}
-.streamlit-expanderHeader:hover {
-    background: #f7f9fc !important;
-}
-
-/* ── Boutons ── */
-.stButton > button {
-    border-radius: 8px !important;
-    font-weight: 600 !important;
+    font-size: .88rem !important;
     border: none !important;
-    transition: all 0.15s ease !important;
+    transition: all 0.12s ease !important;
     cursor: pointer !important;
+    letter-spacing: .01em !important;
 }
 .stButton > button[kind="primary"] {
-    background: #1877f2 !important;
-    color: white !important;
-    box-shadow: 0 1px 3px rgba(24,119,242,.3) !important;
+    background: #0a0a0a !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.15) !important;
 }
 .stButton > button[kind="primary"]:hover {
-    background: #0d5fd8 !important;
-    box-shadow: 0 4px 14px rgba(24,119,242,.4) !important;
+    background: #222 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,.22) !important;
     transform: translateY(-1px) !important;
 }
-.stButton > button[kind="primary"]:active {
-    transform: translateY(0px) !important;
-    box-shadow: 0 1px 3px rgba(24,119,242,.3) !important;
-}
+.stButton > button[kind="primary"]:active { transform: translateY(0) !important; }
 .stButton > button:not([kind="primary"]) {
     background: #ffffff !important;
-    color: #1877f2 !important;
-    border: 1.5px solid #1877f2 !important;
+    color: #0a0a0a !important;
+    border: 1.5px solid #e0e0e0 !important;
 }
 .stButton > button:not([kind="primary"]):hover {
-    background: #eef4ff !important;
+    background: #f5f5f5 !important;
+    border-color: #0a0a0a !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 2px 8px rgba(24,119,242,.15) !important;
 }
 .stButton > button:disabled {
-    opacity: 0.45 !important;
+    opacity: 0.35 !important;
     cursor: not-allowed !important;
     transform: none !important;
     box-shadow: none !important;
 }
 
-/* ── Sidebar ── */
-[data-testid="stSidebar"] {
+/* ── Download button ── */
+.stDownloadButton > button {
+    border-radius: 10px !important;
+    font-weight: 600 !important;
     background: #ffffff !important;
-    border-right: 1px solid #e4e6ea !important;
+    color: #0a0a0a !important;
+    border: 1.5px solid #e0e0e0 !important;
+    transition: all 0.12s ease !important;
 }
-[data-testid="stSidebar"] label,
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] div {
-    color: #1c1e21 !important;
+.stDownloadButton > button:hover {
+    background: #0a0a0a !important;
+    color: #fff !important;
+    border-color: #0a0a0a !important;
+    transform: translateY(-1px) !important;
 }
-
-/* ── Cards stats ── */
-.main-header {
-    background: linear-gradient(135deg, #1877f2, #0a58ca);
-    color: white; padding: 20px 28px; border-radius: 14px;
-    margin-bottom: 20px; display: flex; align-items: center; gap: 16px;
-    box-shadow: 0 4px 20px rgba(24,119,242,.25);
-}
-.main-header h1 { font-size: 1.4rem; margin: 0; color: white !important; }
-.main-header p  { margin: 4px 0 0; opacity: .85; font-size: .85rem; color: white !important; }
-.stat-card {
-    background: white; border-radius: 12px; padding: 16px 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,.07); text-align: center;
-    transition: all 0.18s ease; cursor: default;
-    border: 1px solid #f0f0f0;
-}
-.stat-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,.10);
-    transform: translateY(-2px);
-}
-.stat-card .n { font-size: 2rem; font-weight: 800; color: #1877f2; line-height: 1; }
-.stat-card .l { font-size: .75rem; color: #65676b; margin-top: 4px; }
 
 /* ── Expander ── */
 .streamlit-expanderHeader {
     background: #ffffff !important;
-    color: #1c1e21 !important;
-    border: 1px solid #e4e6ea !important;
-    border-radius: 8px !important;
+    color: #0a0a0a !important;
+    border: 1px solid #e8e8e8 !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: background 0.12s ease !important;
+}
+.streamlit-expanderHeader:hover { background: #f9f9f9 !important; }
+
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {
+    background: #ffffff !important;
+    border-right: 1px solid #ebebeb !important;
 }
 
-/* ── Slider ── */
-.stSlider div[data-testid="stTickBarMin"],
-.stSlider div[data-testid="stTickBarMax"] { color: #65676b !important; }
+/* ── Header metric lab ── */
+.ml-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 0 12px; margin-bottom: 4px;
+    border-bottom: 1px solid #ebebeb;
+}
+.ml-logo {
+    font-family: 'League Spartan', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 900; font-size: 1.85rem; color: #0a0a0a;
+    letter-spacing: -0.03em; line-height: 1;
+}
+.ml-logo span { color: #0a0a0a; }
+.ml-tagline { font-size: .75rem; color: #999; font-weight: 500; margin-top: 2px; letter-spacing: .04em; text-transform: uppercase; }
 
-/* ── Markdown h3 ── */
-h3 { color: #1c1e21 !important; }
+/* ── Stat cards ── */
+.stat-card {
+    background: #ffffff; border-radius: 14px; padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+    text-align: center; transition: all 0.15s ease; cursor: default;
+}
+.stat-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,.09), 0 0 0 1px rgba(0,0,0,.06);
+    transform: translateY(-2px);
+}
+.stat-card .n { font-size: 2rem; font-weight: 800; color: #0a0a0a; line-height: 1; }
+.stat-card .l { font-size: .72rem; color: #999; margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+
+/* ── Brand row ── */
+.brand-row {
+    background: #ffffff; border-radius: 12px; border-left: 3px solid #0a0a0a;
+    padding: 14px 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.03);
+}
+.brand-row-name { font-size: .95rem; font-weight: 700; color: #0a0a0a; margin-bottom: 5px; }
+.brand-row-meta { display: flex; gap: 12px; font-size: .76rem; color: #888; flex-wrap: wrap; }
+.brand-row-meta span { display: inline-flex; align-items: center; gap: 3px; }
+
+/* ── Workflow steps ── */
+.wf-bar {
+    display: flex; align-items: center; gap: 0;
+    background: #ffffff; border-radius: 14px;
+    padding: 12px 20px; margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+}
+.wf-step {
+    flex: 1; text-align: center; padding: 8px 6px;
+    border-radius: 8px; font-size: .8rem; font-weight: 500;
+    color: #bbb; background: transparent; transition: .15s;
+}
+.wf-step .wf-n {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%; font-size: .7rem;
+    font-weight: 700; margin-right: 6px;
+    background: #ebebeb; color: #999;
+}
+.wf-step.wf-done { color: #2d7a47; }
+.wf-step.wf-done .wf-n { background: #d4edda; color: #155724; }
+.wf-step.wf-active { color: #0a0a0a; font-weight: 700; }
+.wf-step.wf-active .wf-n { background: #0a0a0a; color: #fff; }
+.wf-arrow { color: #d8d8d8; font-size: 1.1rem; padding: 0 4px; }
+
+/* ── Context pills ── */
+.context-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #f0f0f0; color: #0a0a0a; border-radius: 20px;
+    padding: 4px 12px; font-size: .74rem; font-weight: 600; margin: 3px;
+    border: 1px solid #e0e0e0;
+}
+.context-pill.green { background: #f0fff4; color: #2d7a47; border-color: #b2e8c5; }
+.context-pill.orange { background: #fff8e6; color: #7a5a00; border-color: #ffd88a; }
+.context-pill.grey { background: #f5f5f5; color: #888; border-color: #e0e0e0; }
+
+/* ── Suggestion pills ── */
+.suggestion-pill {
+    display: inline-block; padding: 7px 15px; margin: 3px;
+    background: #fff; border: 1.5px solid #e0e0e0;
+    border-radius: 20px; font-size: .81rem; color: #333;
+    cursor: pointer; transition: all 0.12s ease; user-select: none;
+}
+.suggestion-pill:hover {
+    border-color: #0a0a0a; color: #0a0a0a;
+    background: #f5f5f5; transform: translateY(-1px);
+}
 
 /* ── Chat ── */
 [data-testid="stChatMessage"] {
     background: #ffffff !important;
     border-radius: 12px !important;
-    border: 1px solid #e8eaf0 !important;
-    margin-bottom: 10px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05) !important;
-}
-[data-testid="stChatMessage"][data-testid*="user"] {
-    background: #eef4ff !important;
+    border: 1px solid #ebebeb !important;
+    margin-bottom: 8px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04) !important;
 }
 [data-testid="stChatInput"] textarea {
     background: #ffffff !important;
-    color: #1c1e21 !important;
-    border: 1.5px solid #d0d5dd !important;
+    color: #0a0a0a !important;
+    border: 1.5px solid #e0e0e0 !important;
     border-radius: 10px !important;
 }
 [data-testid="stChatInput"] textarea:focus {
-    border-color: #1877f2 !important;
-    box-shadow: 0 0 0 3px rgba(24,119,242,.12) !important;
+    border-color: #0a0a0a !important;
+    box-shadow: 0 0 0 3px rgba(10,10,10,.08) !important;
 }
-.context-pill {
-    display: inline-flex; align-items: center; gap: 5px;
-    background: #eef4ff; color: #1877f2; border-radius: 20px;
-    padding: 4px 12px; font-size: .76rem; font-weight: 600; margin: 3px;
-    border: 1px solid #c8d9ff;
-}
-.context-pill.green { background: #f0fff4; color: #2d7a47; border-color: #b2e8c5; }
-.context-pill.orange { background: #fff8e6; color: #7a5a00; border-color: #ffd88a; }
-.context-pill.grey { background: #f5f5f5; color: #65676b; border-color: #e0e0e0; }
-
-/* ── Suggestion pill buttons ── */
-.suggestion-pill {
-    display: inline-block; padding: 7px 14px; margin: 3px;
-    background: #ffffff; border: 1.5px solid #d0d5dd;
-    border-radius: 20px; font-size: .82rem; color: #1c1e21;
-    cursor: pointer; transition: all 0.15s ease;
-    user-select: none;
-}
-.suggestion-pill:hover {
-    border-color: #1877f2; color: #1877f2;
-    background: #eef4ff;
-    transform: translateY(-1px);
-}
-
-/* ── Workflow steps ── */
-.wf-bar {
-    display:flex; align-items:center; gap:0;
-    background:white; border-radius:12px;
-    padding:12px 20px; margin-bottom:20px;
-    box-shadow:0 1px 4px rgba(0,0,0,.08);
-}
-.wf-step {
-    flex:1; text-align:center; padding:8px 6px;
-    border-radius:8px; font-size:.82rem; font-weight:500;
-    color:#adb5bd; background:transparent; transition:.2s;
-}
-.wf-step .wf-n {
-    display:inline-flex; align-items:center; justify-content:center;
-    width:22px; height:22px; border-radius:50%; font-size:.72rem;
-    font-weight:700; margin-right:6px;
-    background:#e4e6ea; color:#65676b;
-}
-.wf-step.wf-done { color:#2d7a47; }
-.wf-step.wf-done .wf-n { background:#d4edda; color:#155724; }
-.wf-step.wf-active { color:#1877f2; font-weight:700; }
-.wf-step.wf-active .wf-n { background:#1877f2; color:white; }
-.wf-arrow { color:#d0d5dd; font-size:1.2rem; padding:0 4px; }
-
-/* ── Brand row ── */
-.brand-row {
-    background:white; border-radius:10px; border-left:4px solid #1877f2;
-    padding:14px 18px; box-shadow:0 1px 4px rgba(0,0,0,.07);
-}
-.brand-row-name { font-size:.98rem; font-weight:700; color:#1c1e21; margin-bottom:5px; }
-.brand-row-meta { display:flex; gap:14px; font-size:.78rem; color:#65676b; flex-wrap:wrap; }
-.brand-row-meta span { display:inline-flex; align-items:center; gap:3px; }
 
 /* ── Empty state ── */
 .empty-state-box {
-    text-align:center; padding:48px 24px; background:white;
-    border-radius:12px; border:2px dashed #d0d5dd; color:#65676b;
-    margin-top:8px;
+    text-align: center; padding: 52px 24px; background: #ffffff;
+    border-radius: 14px; border: 2px dashed #e0e0e0; color: #888; margin-top: 8px;
 }
-.ebox-icon { font-size:2.5rem; margin-bottom:12px; }
-.ebox-title { font-size:1.05rem; font-weight:700; color:#1c1e21; margin-bottom:6px; }
-.ebox-sub { font-size:.85rem; }
+.ebox-icon { font-size: 2.4rem; margin-bottom: 12px; }
+.ebox-title { font-size: 1rem; font-weight: 700; color: #0a0a0a; margin-bottom: 6px; }
+.ebox-sub { font-size: .84rem; }
+
+/* ── Slider ── */
+.stSlider div[data-testid="stTickBarMin"],
+.stSlider div[data-testid="stTickBarMax"] { color: #999 !important; }
+h3 { color: #0a0a0a !important; font-weight: 700 !important; }
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<div class="main-header">
-  <span style="font-size:2rem">📊</span>
+<div class="ml-header">
   <div>
-    <h1>Meta Ads Intelligence</h1>
-    <p>Scrape · Transcrit · Analyse visuellement · Génère du copy expert</p>
+    <div class="ml-logo">metric lab</div>
+    <div class="ml-tagline">Intelligence · Analyse · Prédiction</div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -415,8 +408,9 @@ with st.sidebar:
     st.markdown("**Modèle Whisper**")
     whisper_model = st.selectbox(
         "Modèle Whisper", ["tiny", "base", "small", "medium"],
-        index=1, label_visibility="collapsed",
-        help="Plus grand = plus précis mais plus lent",
+        index=2,  # small par défaut — bien meilleur sur le français
+        label_visibility="collapsed",
+        help="small = bon équilibre précision/vitesse · medium = maximum · base = rapide mais imprécis",
     )
     st.markdown("**Scrolls par page**")
     scroll_count = st.slider("Scrolls", 3, 20, 5, label_visibility="collapsed")
@@ -557,6 +551,23 @@ if _nav == "🏢 Marques":
                 _sc  = [r for r in _all_t if r.get("scoring") and r.get("label") == _pending["label"]]
                 _avg_sc = round(sum(r["scoring"]["score_total"] for r in _sc) / len(_sc), 1) if _sc else None
                 update_brand_stats(_pending["id"], _cnt, _avg_sc)
+                # Suivi temporel — snapshot automatique après chaque scraping
+                try:
+                    from tracker import get_brand_intelligence
+                    _brand_ads = [r for r in _all_t if r.get("page_name") == _pending.get("name") or True]
+                    _intel = get_brand_intelligence(_pending["name"], _all_t)
+                    if _intel.get("has_history") and _intel.get("diff"):
+                        _diff = _intel["diff"]
+                        _summary = _diff.get("summary", {})
+                        if _summary.get("new"):
+                            st.toast(f"🆕 {_summary['new']} nouvelle(s) pub(s) détectée(s) pour {_pending['name']}", icon="📊")
+                        if _summary.get("killed"):
+                            st.toast(f"❌ {_summary['killed']} pub(s) arrêtée(s) depuis le dernier scraping", icon="📉")
+                        if _summary.get("scaling"):
+                            st.toast(f"🚀 {_summary['scaling']} pub(s) en forte croissance de reach !", icon="🔥")
+                        st.session_state[f"_tracker_{_pending['name']}"] = _intel
+                except Exception as _te:
+                    pass  # tracker optionnel
                 st.toast(f"✅ {_pending['name']} — {_cnt} pubs récupérées ! Voici le rapport.", icon="🎉")
                 st.session_state["_nav_to"] = "📊 Rapport"
                 st.rerun()
@@ -599,23 +610,49 @@ if _nav == "🏢 Marques":
             _col_title.markdown(f"### {len(brands_list)} marque(s) configurée(s)")
             _open_form = _col_add.button("➕ Ajouter", key="open_add_form", type="primary")
 
+            # ── Gestion des catégories custom ───────────────────────────
+            with st.expander("🗂 Mes catégories", expanded=False):
+                _sections_list = load_sections()
+                st.caption("Crée tes propres catégories pour regrouper les marques à scraper.")
+                _sec_tags_html = ""
+                _sec_tag_cols = st.columns(min(len(_sections_list), 4) or 1)
+                for _si, _sec in enumerate(_sections_list):
+                    with _sec_tag_cols[_si % 4]:
+                        _sc1, _sc2 = st.columns([5, 1])
+                        _sc1.markdown(f"<span style='font-weight:600'>{_sec}</span>", unsafe_allow_html=True)
+                        if _sc2.button("✕", key=f"delsec_{_si}"):
+                            remove_section(_sec)
+                            st.rerun()
+                st.markdown("---")
+                _ns1, _ns2 = st.columns([5, 1])
+                _new_sec_name = _ns1.text_input("Nom de la catégorie", placeholder="ex: 🐱 Chats · 🇫🇷 Concurrents FR · 🛒 Ecom US", key="new_sec", label_visibility="collapsed")
+                if _ns2.button("Créer", key="add_sec", type="primary"):
+                    if _new_sec_name.strip():
+                        add_section(_new_sec_name.strip())
+                        st.rerun()
+
             with st.expander("Ajouter une marque", expanded=_open_form or len(brands_list) == 0):
+                _PERF_LEVELS_FORM = ["⭐ Top Performers", "🆕 Nouvelles Créas", "🧪 En test", "💡 Inspiration"]
                 _fa, _fb = st.columns([2, 5])
                 _new_name  = _fa.text_input("Nom", placeholder="ex: Bonjour", key="bn")
                 _new_url   = _fb.text_input("URL Meta Ads Library", placeholder="https://www.facebook.com/ads/library/?...", key="bu")
-                _fc, _fd = st.columns([2, 3])
-                _new_label = _fc.selectbox("Label", ["Top Performers", "Nouvelles Créas"], key="bl")
-                try:
-                    from brands import NICHES
-                    _new_niche = _fd.selectbox("Niche", list(NICHES.keys()), key="bniche")
-                except Exception:
-                    _new_niche = "🐾 Animaux"
-                if st.button("✅ Sauvegarder cette marque", type="primary", key="add_brand",
+                _sections_opts = load_sections()
+                _fc, _fd = st.columns([1, 1])
+                _add_perf   = _fc.multiselect("Niveau", _PERF_LEVELS_FORM, default=["⭐ Top Performers"], key="add_perf")
+                _add_niches = _fd.multiselect("Catégories", _sections_opts, key="add_niches")
+                if st.button("✅ Sauvegarder", type="primary", key="add_brand",
                              disabled=not (_new_name.strip() and _new_url.strip())):
-                    add_brand(_new_name, _new_url, _new_label, niche=_new_niche)
+                    _add_tags = _add_perf + _add_niches
+                    _add_label = _add_perf[0] if _add_perf else (_add_niches[0] if _add_niches else "")
+                    add_brand(_new_name, _new_url, _add_label)
+                    # Sauvegarder les tags
+                    _all_b = load_brands()
+                    for _b in _all_b:
+                        if _b["name"] == _new_name.strip():
+                            _b["tags"] = _add_tags
+                    save_brands(_all_b)
                     st.success(f"✅ **{_new_name}** ajoutée !")
                     st.rerun()
-                st.caption("💡 Copie l'URL depuis la Bibliothèque publicitaire Meta après avoir recherché la marque.")
 
             st.markdown("<br>", unsafe_allow_html=True)
 
@@ -638,21 +675,64 @@ if _nav == "🏢 Marques":
 
                 st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
+                # Niveaux de performance fixes
+                _PERF_LEVELS = ["⭐ Top Performers", "🆕 Nouvelles Créas", "🧪 En test", "💡 Inspiration"]
+
+                _editing_brand = st.session_state.get("_editing_brand_id")
+
                 for _brand in brands_list:
                     _last  = _brand.get("last_scraped") or "Jamais scrapée"
                     _ads_n = _brand.get("ad_count", 0)
                     _avg   = _brand.get("avg_score")
-                    if _avg:
-                        _sc_html = f'<span style="color:{"#155724" if _avg>=7 else "#856404"};font-weight:700">⭐ {_avg}/10</span>'
-                    else:
-                        _sc_html = '<span style="color:#adb5bd">Non scorée</span>'
+                    _sc_html = f'<span style="color:{"#155724" if _avg>=7 else "#856404"};font-weight:700">⭐ {_avg}/10</span>' if _avg else '<span style="color:#adb5bd">Non scorée</span>'
+                    _bid = _brand["id"]
 
+                    # Compat : si l'ancien champ label existe, le convertir en tags
+                    if "tags" not in _brand:
+                        _old_label = _brand.get("label", "")
+                        _brand["tags"] = [_old_label] if _old_label else []
+
+                    # ── Mode édition inline ────────────────────────────
+                    if _editing_brand == _bid:
+                        with st.container():
+                            st.markdown(f"**✏️ {_brand['name']}**")
+                            _edit_cats = load_sections()
+                            _cur_tags = _brand.get("tags", [])
+                            _cur_perf = [t for t in _cur_tags if t in _PERF_LEVELS]
+                            _cur_niches = [t for t in _cur_tags if t not in _PERF_LEVELS]
+                            _ec1, _ec2 = st.columns([1, 1])
+                            _sel_perf = _ec1.multiselect("Niveau de performance", _PERF_LEVELS, default=_cur_perf, key=f"edit_perf_{_bid}")
+                            _sel_niches = _ec2.multiselect("Catégories", _edit_cats, default=[n for n in _cur_niches if n in _edit_cats], key=f"edit_niches_{_bid}")
+                            _new_notes = st.text_input("Notes", value=_brand.get("notes", ""), placeholder="optionnel", key=f"edit_notes_{_bid}")
+                            _es1, _es2 = st.columns([1, 1])
+                            if _es1.button("💾 Sauvegarder", key=f"save_edit_{_bid}", type="primary", use_container_width=True):
+                                _all_brands = load_brands()
+                                for _b in _all_brands:
+                                    if _b["id"] == _bid:
+                                        _b["tags"] = _sel_perf + _sel_niches
+                                        _b["label"] = _sel_perf[0] if _sel_perf else (_sel_niches[0] if _sel_niches else "")
+                                        _b["notes"] = _new_notes
+                                save_brands(_all_brands)
+                                st.session_state.pop("_editing_brand_id", None)
+                                st.rerun()
+                            if _es2.button("Annuler", key=f"cancel_edit_{_bid}", use_container_width=True):
+                                st.session_state.pop("_editing_brand_id", None)
+                                st.rerun()
+                        st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
+                        continue
+
+                    # ── Affichage normal ───────────────────────────────
+                    _tags = _brand.get("tags", [_brand.get("label", "")])
+                    _tags_html = " ".join(
+                        f'<span style="background:{"#fff3cd" if t in _PERF_LEVELS else "#e8f4fd"};border:1px solid {"#ffc107" if t in _PERF_LEVELS else "#90caf9"};border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600">{t}</span>'
+                        for t in _tags if t
+                    )
                     _cinfo, _cbtn = st.columns([5, 2])
                     _cinfo.markdown(f"""
                     <div class="brand-row">
                       <div class="brand-row-name">🏢 {_brand['name']}</div>
-                      <div class="brand-row-meta">
-                        <span>🏷️ {_brand.get('label','')}</span>
+                      <div class="brand-row-meta" style="gap:6px;flex-wrap:wrap">
+                        {_tags_html}
                         <span>📅 {_last}</span>
                         <span>📺 {_ads_n} pub{"s" if _ads_n != 1 else ""}</span>
                         <span>{_sc_html}</span>
@@ -661,14 +741,15 @@ if _nav == "🏢 Marques":
                     """, unsafe_allow_html=True)
 
                     with _cbtn:
-                        _b1, _b2 = st.columns([3, 1])
-                        if _b1.button("▶ Scraper", key=f"sc_{_brand['id']}",
-                                      use_container_width=True, type="primary"):
+                        _b1, _b2, _b3 = st.columns([3, 1, 1])
+                        if _b1.button("▶ Scraper", key=f"sc_{_bid}", use_container_width=True, type="primary"):
                             st.session_state["_pending_scrape"] = _brand
                             st.rerun()
-                        if _b2.button("✕", key=f"dl_{_brand['id']}",
-                                      use_container_width=True, help="Supprimer cette marque"):
-                            remove_brand(_brand["id"])
+                        if _b2.button("✏️", key=f"ed_{_bid}", use_container_width=True, help="Modifier"):
+                            st.session_state["_editing_brand_id"] = _bid
+                            st.rerun()
+                        if _b3.button("✕", key=f"dl_{_bid}", use_container_width=True, help="Supprimer"):
+                            remove_brand(_bid)
                             st.rerun()
                     st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
 
@@ -772,32 +853,329 @@ if _nav == "📊 Rapport":
 
     html_path = OUTPUT_DIR / "rapport.html"
 
-    col_a, col_b = st.columns([1, 1])
-    with col_a:
-        if st.button("🔄 Régénérer le rapport HTML"):
-            result = subprocess.run(
-                [PYTHON, "regenerate_report.py"],
-                capture_output=True, text=True, cwd=str(BASE_DIR),
-            )
-            if result.returncode == 0:
-                st.success("Rapport régénéré ✓")
-                st.rerun()
-            else:
-                st.error(result.stdout + result.stderr)
-    with col_b:
-        if html_path.exists():
-            st.download_button(
-                "⬇️ Télécharger rapport.html",
-                data=html_path.read_bytes(),
-                file_name="rapport_meta_ads.html",
-                mime="text/html",
-            )
+    # ── Toggle vue ──────────────────────────────
+    _view_mode = st.radio(
+        "Vue", ["📋 Pubs décortiquées", "📄 Rapport HTML"],
+        horizontal=True, label_visibility="collapsed",
+        key="rapport_view_mode"
+    )
 
-    if html_path.exists():
-        html_content = html_path.read_text(encoding="utf-8")
-        st.components.v1.html(html_content, height=820, scrolling=True)  # noqa: ignore deprecation — st.iframe uses srcdoc (null origin) which breaks window.top navigation
+    # ── Vue pubs décortiquées ───────────────────
+    if _view_mode == "📋 Pubs décortiquées":
+        if not transcriptions:
+            st.info("Lance d'abord un scraping pour voir les pubs.")
+        else:
+            from intelligence import AD_FORMATS, detect_format
+
+            # ── Auto-détecter le format de chaque pub (local, gratuit) ──
+            for _r in transcriptions:
+                if not _r.get("ad_format"):
+                    _r["ad_format"] = detect_format(
+                        _r.get("transcript", ""),
+                        _r.get("visual_analysis")
+                    )
+
+            # ── Distribution des formats ─────────────────────────────
+            from collections import Counter
+            _fmt_counts = Counter(r.get("ad_format", "ugc") for r in transcriptions)
+            _dist_html = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">'
+            _dist_html += '<span style="font-size:.75rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-right:4px">Formats</span>'
+            for _fk, _fcount in sorted(_fmt_counts.items(), key=lambda x: -x[1]):
+                _fname = AD_FORMATS.get(_fk, {}).get("name", _fk)
+                _fcolor = AD_FORMATS.get(_fk, {}).get("color", "#888")
+                _dist_html += f'<span style="background:{_fcolor}18;border:1.5px solid {_fcolor}55;border-radius:20px;padding:3px 11px;font-size:.76rem;font-weight:700;color:{_fcolor};cursor:pointer" title="Cliquer pour filtrer">{_fname} <b style=\'background:{_fcolor};color:#fff;border-radius:10px;padding:1px 6px;font-size:.7rem;margin-left:3px\'>{_fcount}</b></span>'
+            _dist_html += '</div>'
+            st.markdown(_dist_html, unsafe_allow_html=True)
+
+            # ── Bouton classifier avec IA ───────────────────────────
+            _clf_col1, _clf_col2 = st.columns([4, 1])
+            with _clf_col2:
+                if st.button("🧠 Classifier avec IA", key="classify_ai_btn",
+                             help="Claude re-classifie chaque pub avec plus de précision"):
+                    _api = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+                    if _api:
+                        try:
+                            from intelligence import classify_all
+                            with st.spinner("Classification en cours..."):
+                                _tc, _ = classify_all(transcriptions)
+                            _save_transcriptions(_tc)
+                            st.success("✅ Formats mis à jour !")
+                            st.rerun()
+                        except Exception as _e:
+                            st.error(f"Erreur : {_e}")
+                    else:
+                        st.warning("Clé API manquante")
+
+            # ── Filtres ─────────────────────────────────────────────
+            _fc1, _fc2, _fc3, _fc4 = st.columns([3, 2, 2, 2])
+            _search_r    = _fc1.text_input("Rechercher", placeholder="mot-clé...", key="rpt_search", label_visibility="collapsed")
+            _labels_avail = sorted(set(r.get("label","") for r in transcriptions if r.get("label")))
+            _label_filter = _fc2.selectbox("Catégorie", ["Toutes"] + _labels_avail, key="rpt_label", label_visibility="collapsed")
+            _fmt_avail    = sorted(set(r.get("ad_format","ugc") for r in transcriptions))
+            _fmt_names    = {k: AD_FORMATS.get(k,{}).get("name", k) for k in _fmt_avail}
+            _fmt_filter   = _fc3.selectbox("Format", ["Tous"] + [_fmt_names[k] for k in _fmt_avail], key="rpt_fmt", label_visibility="collapsed")
+            _sort_by      = _fc4.selectbox("Trier par", ["Position", "Reach EU", "Score", "Date"], key="rpt_sort", label_visibility="collapsed")
+
+            _rpt_all = transcriptions[:]
+            if _search_r:
+                _rpt_all = [r for r in _rpt_all if _search_r.lower() in r.get("transcript","").lower()]
+            if _label_filter != "Toutes":
+                _rpt_all = [r for r in _rpt_all if r.get("label") == _label_filter]
+            if _fmt_filter != "Tous":
+                _rpt_all = [r for r in _rpt_all if _fmt_names.get(r.get("ad_format","ugc")) == _fmt_filter]
+            if _sort_by == "Reach EU":
+                _rpt_all = sorted(_rpt_all, key=lambda r: r.get("eu_reach") or 0, reverse=True)
+            elif _sort_by == "Score":
+                _rpt_all = sorted(_rpt_all, key=lambda r: (r.get("scoring") or {}).get("score_total") or 0, reverse=True)
+            elif _sort_by == "Date":
+                _rpt_all = sorted(_rpt_all, key=lambda r: r.get("start_date") or "", reverse=True)
+
+            st.caption(f"{len(_rpt_all)} pub(s)")
+
+            def _fmt_reach(v):
+                if not v: return None
+                if v >= 1_000_000: return f"{v/1_000_000:.1f}M"
+                if v >= 1_000: return f"{v/1_000:.0f}K"
+                return str(v)
+
+            def _days_active(start_str):
+                if not start_str: return None
+                try:
+                    from datetime import date
+                    d = date.fromisoformat(start_str[:10])
+                    return (date.today() - d).days
+                except Exception:
+                    return None
+
+            def _deconstruct_ad(transcript: str, api_key: str):
+                """Appelle Claude pour décomposer la pub en sections."""
+                import anthropic, json as _json
+                client = anthropic.Anthropic(api_key=api_key)
+                prompt = f"""Tu es expert en analyse de publicités Meta.
+Analyse cette transcription et extrais chaque section. Sois précis et cite le texte exact (extrait court).
+
+Transcription :
+\"\"\"
+{transcript[:3000]}
+\"\"\"
+
+Réponds UNIQUEMENT en JSON valide avec ces clés :
+{{
+  "hook": "les 1-2 premières phrases — l'accroche exacte",
+  "hook_type": "type (ex: question, stat choc, identification douleur, story, contradiction)",
+  "contexte_probleme": "la mise en contexte du problème / douleur",
+  "preuve": "preuves / social proof / chiffres / témoignage (ou null)",
+  "solution": "la solution / bénéfice produit présenté",
+  "cta": "l'appel à l'action final (ou null)",
+  "ton": "le ton dominant (ex: conversationnel, urgence, autorité, empathie, humour)",
+  "structure_resumee": "1 phrase résumant la structure (ex: Douleur → Identification → Preuve → Produit → CTA)"
+}}"""
+                msg = client.messages.create(
+                    model="claude-sonnet-4-6",
+                    max_tokens=1024,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                raw = msg.content[0].text.strip()
+                # extraire le JSON
+                if "```" in raw:
+                    raw = raw.split("```")[1]
+                    if raw.startswith("json"): raw = raw[4:]
+                return _json.loads(raw)
+
+            _decon_cache = st.session_state.setdefault("_decon_cache", {})
+
+            for _r in _rpt_all:
+                _pos        = _r.get("position", "?")
+                _label      = _r.get("label", "")
+                _brand      = _r.get("page_name", "")
+                _lang       = _r.get("lang", "")
+                _words      = len((_r.get("transcript") or "").split())
+                _reach      = _fmt_reach(_r.get("eu_reach"))
+                _days       = _days_active(_r.get("start_date"))
+                _score      = (_r.get("scoring") or {}).get("score_total")
+                _ad_id      = _r.get("ad_id") or ""
+                _transcript = _r.get("transcript", "")
+                _hook_3s    = _r.get("hook_3s") or _transcript[:120]
+                _card_key   = f"card_{_pos}_{_label}"
+
+                # Perf composite
+                _perf       = _r.get("performance") or {}
+                _composite  = _perf.get("composite")
+                _conf       = _perf.get("confidence", "low")
+                _conf_icon  = {"high": "🟢", "medium": "🟡", "low": "🔴"}.get(_conf, "⚪")
+
+                # Badge label
+                _badge_color  = "#fff3cd" if "Top" in _label else "#f0f0f0"
+                _badge_border = "#ffc107" if "Top" in _label else "#d0d0d0"
+                _label_icon   = "⭐" if "Top" in _label else "🆕"
+
+                # Format visuel
+                _ad_fmt    = _r.get("ad_format", "ugc")
+                _fmt_src   = _r.get("ad_format_source", "text_fallback")
+                _fmt_info  = AD_FORMATS.get(_ad_fmt, {})
+                _fmt_name  = _fmt_info.get("name", _ad_fmt)
+                _fmt_color = _fmt_info.get("color", "#888")
+                _fmt_src_icon = "👁" if _fmt_src == "vision" else "📝"
+                _fmt_src_title = "Détecté par Vision IA (haute confiance)" if _fmt_src == "vision" else "Estimé depuis le texte"
+
+                # Score composite badge
+                if _composite is not None:
+                    _sc_bg  = "#d4edda" if _composite >= 70 else ("#fff3cd" if _composite >= 40 else "#f8d7da")
+                    _sc_col = "#155724" if _composite >= 70 else ("#856404" if _composite >= 40 else "#721c24")
+                    _rs  = _perf.get("reach_score", 0)
+                    _ls  = _perf.get("longevity_score", 0)
+                    _qs  = _perf.get("quality_score", 0)
+                    _tip = f"Score composite — reach:{_rs:.0f} longévité:{_ls:.0f} qualité:{_qs:.0f}"
+                    _composite_badge = (
+                        f'<span style="background:{_sc_bg};color:{_sc_col};border-radius:10px;'
+                        f'padding:2px 10px;font-size:11px;font-weight:800" title="{_tip}">'
+                        f'{_conf_icon} {_composite}/100</span>'
+                    )
+                else:
+                    _composite_badge = ""
+
+                # Hook score badge
+                _hs_data = _r.get("hook_scoring") or {}
+                _hs_val  = _hs_data.get("stop_scroll_score")
+                _hs_mech = _hs_data.get("mechanism_label", "")
+                if _hs_val is not None:
+                    _hs_bg  = "#d4edda" if _hs_val >= 8 else ("#fff3cd" if _hs_val >= 6 else "#f8d7da")
+                    _hs_col = "#155724" if _hs_val >= 8 else ("#856404" if _hs_val >= 6 else "#721c24")
+                    _hook_badge = (f'<span style="background:{_hs_bg};color:{_hs_col};border-radius:10px;'
+                                   f'padding:2px 10px;font-size:11px;font-weight:800" title="{_hs_mech}">'
+                                   f'🎣 {_hs_val}/10</span>')
+                else:
+                    _hook_badge = ""
+
+                # Body structure badge
+                _bs_data   = _r.get("body_scoring") or {}
+                _bs_val    = _bs_data.get("overall_structure_score")
+                _drop_risk = _bs_data.get("drop_risk", "")
+                if _bs_val is not None:
+                    _bs_bg  = "#d4edda" if _bs_val >= 7 else ("#fff3cd" if _bs_val >= 5 else "#f8d7da")
+                    _bs_col = "#155724" if _bs_val >= 7 else ("#856404" if _bs_val >= 5 else "#721c24")
+                    _body_badge = (f'<span style="background:{_bs_bg};color:{_bs_col};border-radius:10px;'
+                                   f'padding:2px 10px;font-size:11px;font-weight:800" title="Drop risk: {_drop_risk}">'
+                                   f'📐 {_bs_val}/10</span>')
+                else:
+                    _body_badge = ""
+
+                # Stats
+                _stat_parts = []
+                if _reach:           _stat_parts.append(f"📡 {_reach} reach EU")
+                if _days is not None: _stat_parts.append(f"⏱ {_days}j actif")
+                if _score:           _stat_parts.append(f"🤖 {_score}/10")
+                if _brand:           _stat_parts.append(f"🏢 {_brand}")
+                if _lang:            _stat_parts.append(f"🌐 {_lang}")
+                _stat_parts.append(f"📝 {_words} mots")
+                _stats_str = "  ·  ".join(_stat_parts)
+
+                _lib_url = f"https://www.facebook.com/ads/library/?id={_ad_id}" if _ad_id else None
+
+                with st.container():
+                    st.markdown(f"""
+<div style="border:1px solid #e8e8e8;border-radius:14px;padding:16px 18px;margin-bottom:10px;background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,.05)">
+  <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap">
+    <span style="background:{_badge_color};border:1px solid {_badge_border};border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700">{_label_icon} {_label} #{_pos}</span>
+    <span style="background:{_fmt_color}18;border:1.5px solid {_fmt_color}66;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;color:{_fmt_color}" title="{_fmt_src_title}">{_fmt_src_icon} {_fmt_name}</span>
+    {_composite_badge}{_hook_badge}{_body_badge}
+    <span style="color:#bbb;font-size:11px">{_stats_str}</span>
+    {"<a href='" + _lib_url + "' target='_blank' style='font-size:11px;color:#666;text-decoration:none'>🔗</a>" if _lib_url else ""}
+  </div>
+  <div style="margin-bottom:8px">
+    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#999">🎣 Hook 0-3s</span>
+    <div style="color:#0a0a0a;font-size:14px;line-height:1.6;font-weight:600;margin-top:3px;border-left:3px solid {_fmt_color};padding-left:10px">{_hook_3s.replace(chr(10),' ')}</div>
+  </div>
+  <div style="color:#555;font-size:12.5px;line-height:1.55;margin-top:6px">{_transcript[len(_hook_3s):len(_hook_3s)+180].strip().replace(chr(10),' ')}{"..." if len(_transcript) > len(_hook_3s)+180 else ""}</div>
+</div>
+""", unsafe_allow_html=True)
+
+                    _btn1, _btn2, _btn3 = st.columns([2, 2, 2])
+
+                    # Bouton décortiquer
+                    _is_deconstructed = _card_key in _decon_cache
+                    if _btn1.button(
+                        "✅ Décortiqué" if _is_deconstructed else "🔍 Décortiquer",
+                        key=f"dec_{_card_key}",
+                        use_container_width=True,
+                        type="secondary"
+                    ):
+                        if not _is_deconstructed:
+                            _api = os.environ.get("ANTHROPIC_API_KEY","").strip()
+                            if not _api:
+                                st.warning("Clé API manquante")
+                            else:
+                                with st.spinner("Analyse en cours..."):
+                                    try:
+                                        _decon_cache[_card_key] = _deconstruct_ad(_transcript, _api)
+                                    except Exception as _e:
+                                        st.error(f"Erreur : {_e}")
+                                st.rerun()
+                        else:
+                            del _decon_cache[_card_key]
+                            st.rerun()
+
+                    if _btn2.button("📋 Copier", key=f"copy_{_card_key}", use_container_width=True):
+                        st.session_state[f"_clipboard_{_card_key}"] = _transcript
+                        st.toast("Transcription copiée !", icon="📋")
+
+                    if _btn3.button("🎯 Adapter", key=f"adapt_{_card_key}", use_container_width=True, type="primary"):
+                        idx = transcriptions.index(_r) if _r in transcriptions else None
+                        if idx is not None:
+                            st.session_state["adapt_prefill"] = idx
+                        st.session_state["_nav_to"] = "📊 Rapport"
+                        st.rerun()
+
+                    # Affichage du décorticage
+                    if _card_key in _decon_cache:
+                        _d = _decon_cache[_card_key]
+                        st.markdown(f"""
+<div style="background:#f0f7ff;border-left:4px solid #1877f2;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:16px">
+  <div style="font-size:13px;color:#555;margin-bottom:10px;font-weight:600">📐 {_d.get('structure_resumee','')}</div>
+  <div style="display:grid;gap:8px">
+    <div><span style="background:#fff3cd;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">🎣 HOOK · {_d.get('hook_type','')}</span><br><span style="font-size:13px;color:#333;margin-top:4px;display:block">"{_d.get('hook','')}"</span></div>
+    <div><span style="background:#fce4ec;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">😣 PROBLÈME</span><br><span style="font-size:13px;color:#333;display:block">"{_d.get('contexte_probleme','')}"</span></div>
+    {"<div><span style='background:#e8f5e9;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700'>✅ PREUVE</span><br><span style='font-size:13px;color:#333;display:block'>" + '"' + str(_d.get('preuve','')) + '"' + "</span></div>" if _d.get('preuve') else ""}
+    <div><span style="background:#e3f2fd;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">💡 SOLUTION</span><br><span style="font-size:13px;color:#333;display:block">"{_d.get('solution','')}"</span></div>
+    {"<div><span style='background:#f3e5f5;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700'>🎯 CTA</span><br><span style='font-size:13px;color:#333;display:block'>" + '"' + str(_d.get('cta','')) + '"' + "</span></div>" if _d.get('cta') else ""}
+    <div style="margin-top:4px;font-size:12px;color:#888">Ton : <b>{_d.get('ton','')}</b></div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+                    # Transcription complète
+                    with st.expander("📄 Transcription complète", expanded=False):
+                        st.text(_transcript)
+                        if _lib_url:
+                            st.markdown(f"[🔗 Voir sur Facebook Ad Library]({_lib_url})")
+
+    # ── Vue HTML ────────────────────────────────
     else:
-        st.info("Aucun rapport disponible. Lance d'abord un scraping dans l'onglet **Scraper**.")
+        col_a, col_b = st.columns([1, 1])
+        with col_a:
+            if st.button("🔄 Régénérer le rapport HTML"):
+                result = subprocess.run(
+                    [PYTHON, "regenerate_report.py"],
+                    capture_output=True, text=True, cwd=str(BASE_DIR),
+                )
+                if result.returncode == 0:
+                    st.success("Rapport régénéré ✓")
+                    st.rerun()
+                else:
+                    st.error(result.stdout + result.stderr)
+        with col_b:
+            if html_path.exists():
+                st.download_button(
+                    "⬇️ Télécharger rapport.html",
+                    data=html_path.read_bytes(),
+                    file_name="rapport_meta_ads.html",
+                    mime="text/html",
+                )
+        if html_path.exists():
+            html_content = html_path.read_text(encoding="utf-8")
+            st.components.v1.html(html_content, height=820, scrolling=True)  # noqa: ignore deprecation
+        else:
+            st.info("Aucun rapport disponible. Lance d'abord un scraping dans l'onglet **Scraper**.")
 
     # ── Adaptateur de script ──────────────────
     st.markdown("---")
@@ -1022,7 +1400,7 @@ if _nav == "🔬 Intelligence":
 
     _intel_available = False
     try:
-        from intelligence import AD_FORMATS, classify_all, analyze_patterns, generate_from_pattern_stream, detect_format
+        from intelligence import AD_FORMATS, classify_all, analyze_patterns, generate_from_pattern_stream, detect_format, cluster_hooks, generate_video_brief, compare_sections
         _intel_available = True
     except ImportError:
         st.error("Module intelligence.py introuvable.")
@@ -1065,6 +1443,265 @@ if _nav == "🔬 Intelligence":
                     _niches[n] = _niches.get(n, 0) + 1
                 if _niches:
                     st.caption("**Niches :** " + " · ".join(f"{n} ({c} marque{'s' if c > 1 else ''})" for n, c in _niches.items()))
+
+            st.markdown("---")
+
+            # ── Scores hooks ───────────────────────────────────────────────
+            st.markdown("#### 🎣 Analyse des hooks")
+            _hooks_scored = [r for r in transcriptions if r.get("hook_scoring")]
+            _hooks_unscored = [r for r in transcriptions if not r.get("hook_scoring") and r.get("hook_3s")]
+
+            if _hooks_scored:
+                # Classement hooks par score stop-scroll
+                _hooks_ranked = sorted(
+                    _hooks_scored,
+                    key=lambda r: (r.get("hook_scoring") or {}).get("stop_scroll_score", 0),
+                    reverse=True
+                )
+                _mech_counts = {}
+                for r in _hooks_scored:
+                    m = (r.get("hook_scoring") or {}).get("mechanism_label", "?")
+                    _mech_counts[m] = _mech_counts.get(m, 0) + 1
+
+                _h1, _h2 = st.columns([3, 2])
+                with _h1:
+                    st.caption(f"**{len(_hooks_scored)} hooks scorés** · Mécanismes dominants : " +
+                               " · ".join(f"{m} ({c})" for m, c in sorted(_mech_counts.items(), key=lambda x: -x[1])[:4]))
+                with _h2:
+                    if st.button("🎣 Scorer les hooks manquants", key="score_missing_hooks",
+                                 disabled=not _hooks_unscored or not api_key):
+                        from scorer import score_hook
+                        from product_context import load_context, format_for_prompt as _fprod
+                        _prod_str = _fprod(load_context())
+                        _prog = st.progress(0)
+                        for _i, _r in enumerate(_hooks_unscored):
+                            _r["hook_scoring"] = score_hook(_r.get("hook_3s",""), api_key, _prod_str)
+                            _prog.progress((_i+1)/len(_hooks_unscored))
+                        _save_transcriptions(transcriptions)
+                        st.rerun()
+
+                for _r in _hooks_ranked[:5]:
+                    _hs = _r.get("hook_scoring", {})
+                    _ss = _hs.get("stop_scroll_score", "?")
+                    _mech = _hs.get("mechanism_label", "?")
+                    _trigger = _hs.get("emotional_trigger", "")
+                    _hook_txt = _r.get("hook_3s") or ""
+                    _ss_color = "#155724" if isinstance(_ss, (int,float)) and _ss >= 8 else ("#856404" if isinstance(_ss, (int,float)) and _ss >= 6 else "#721c24")
+                    _ss_bg = "#d4edda" if isinstance(_ss, (int,float)) and _ss >= 8 else ("#fff3cd" if isinstance(_ss, (int,float)) and _ss >= 6 else "#f8d7da")
+                    st.markdown(f"""
+<div style="background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:12px 16px;margin-bottom:8px">
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+    <span style="background:{_ss_bg};color:{_ss_color};border-radius:8px;padding:2px 10px;font-size:12px;font-weight:800">🎣 {_ss}/10</span>
+    <span style="background:#f0f0f0;border-radius:8px;padding:2px 10px;font-size:11px;font-weight:600">{_mech}</span>
+    <span style="color:#aaa;font-size:11px">⚡ {_trigger}</span>
+    <span style="color:#aaa;font-size:11px">🏢 {_r.get("page_name","?")}</span>
+  </div>
+  <div style="font-size:13.5px;font-weight:600;color:#0a0a0a;font-style:italic">"{_hook_txt[:150]}"</div>
+  {f'<div style="font-size:11px;color:#666;margin-top:6px;padding:6px 10px;background:#f9f9f9;border-radius:6px">💡 {_hs.get("improved_version","")}</div>' if _hs.get("improved_version") else ""}
+</div>
+""", unsafe_allow_html=True)
+            elif _hooks_unscored:
+                st.info(f"{len(_hooks_unscored)} hooks à scorer — clique sur le bouton ci-dessus.")
+                if st.button("🎣 Scorer tous les hooks", key="score_all_hooks", type="primary",
+                             disabled=not api_key):
+                    from scorer import score_hook
+                    from product_context import load_context, format_for_prompt as _fprod
+                    _prod_str = _fprod(load_context())
+                    _prog = st.progress(0)
+                    for _i, _r in enumerate(_hooks_unscored):
+                        _r["hook_scoring"] = score_hook(_r.get("hook_3s",""), api_key, _prod_str)
+                        _prog.progress((_i+1)/len(_hooks_unscored))
+                    _save_transcriptions(transcriptions)
+                    st.rerun()
+            else:
+                st.caption("Re-scrape pour obtenir les hooks 0-3s analysés.")
+
+            # ── Clustering sémantique ──────────────────────────────────────
+            st.markdown("---")
+            st.markdown("#### 🧬 Clusters de mécanismes psychologiques")
+            _cached_clusters = st.session_state.get("_hook_clusters")
+            _cl1, _cl2 = st.columns([2, 3])
+            _run_clusters = _cl1.button(
+                "🧬 Identifier les mécanismes",
+                type="primary",
+                disabled=not api_key or len(transcriptions) < 3,
+                key="run_cluster_analysis",
+            )
+            _cl2.caption("Claude regroupe tous tes hooks par mécanique psychologique sous-jacente — indépendamment des mots.")
+
+            if _run_clusters:
+                with st.spinner("Clustering sémantique en cours..."):
+                    _cached_clusters = cluster_hooks(transcriptions, api_key)
+                    st.session_state["_hook_clusters"] = _cached_clusters
+
+            if _cached_clusters and "error" not in _cached_clusters:
+                _clusters = _cached_clusters.get("clusters", [])
+                _dominant = _cached_clusters.get("dominant_mechanism", "")
+                _underused = _cached_clusters.get("underused_opportunity", "")
+                _reco = _cached_clusters.get("recommendation", "")
+
+                if _reco:
+                    st.markdown(f"""<div style="background:#0a0a0a;color:#fff;border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:13.5px;line-height:1.6">
+💡 <b>Recommandation stratégique</b><br>{_reco}
+</div>""", unsafe_allow_html=True)
+
+                if _underused:
+                    st.markdown(f"""<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px">
+🎯 <b>Opportunité non exploitée</b> — {_underused}
+</div>""", unsafe_allow_html=True)
+
+                _cluster_cols = st.columns(min(len(_clusters), 2))
+                for _ci, _cl in enumerate(_clusters):
+                    with _cluster_cols[_ci % 2]:
+                        _cl_ids = _cl.get("hook_ids", [])
+                        _cl_avg = _cl.get("strength_avg")
+                        st.markdown(f"""
+<div style="background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+  <div style="font-weight:800;font-size:14px;color:#0a0a0a">{_cl.get("label","")}</div>
+  <div style="font-size:11px;color:#888;margin:4px 0">{len(_cl_ids)} pubs · avg {_cl_avg}/10</div>
+  <div style="font-size:12.5px;color:#444;margin:6px 0;line-height:1.5">{_cl.get("why_it_works","")}</div>
+  <div style="background:#f5f5f5;border-radius:8px;padding:8px 10px;font-size:12px;font-style:italic;color:#333;margin-top:6px">
+    📋 {_cl.get("template","")}
+  </div>
+  <div style="font-size:11px;color:#888;margin-top:6px">🎯 {_cl.get("best_contexts","")}</div>
+</div>
+""", unsafe_allow_html=True)
+
+            st.markdown("---")
+
+            # ── Comparaison cross-sections ────────────────────────────────
+            st.markdown("#### 📊 Comparaison par section")
+            _sections_data = compare_sections(transcriptions)
+            if _sections_data:
+                _sec_cols = st.columns(min(len(_sections_data), 3))
+                for _si, (_sec_name, _sec_stats) in enumerate(_sections_data.items()):
+                    with _sec_cols[_si % 3]:
+                        _avg_r = _sec_stats.get("avg_reach")
+                        _avg_hs = _sec_stats.get("avg_hook_score")
+                        _top_fmt = _sec_stats.get("top_format") or "?"
+                        _top_mech = _sec_stats.get("top_mechanism") or "?"
+                        _fmt_info = AD_FORMATS.get(_top_fmt, {})
+                        st.markdown(f"""
+<div style="background:#fff;border:2px solid #0a0a0a;border-radius:12px;padding:14px 16px;margin-bottom:10px">
+  <div style="font-weight:800;font-size:14px;color:#0a0a0a;margin-bottom:10px">{_sec_name}</div>
+  <div style="font-size:12px;color:#444;margin-bottom:4px">📢 <b>{_sec_stats['ad_count']}</b> pubs</div>
+  <div style="font-size:12px;color:#444;margin-bottom:4px">👁 Reach moyen : <b>{f"{_avg_r:,}" if _avg_r else "N/A"}</b></div>
+  <div style="font-size:12px;color:#444;margin-bottom:4px">🎣 Hook score moyen : <b>{_avg_hs or "N/A"}/10</b></div>
+  <div style="font-size:12px;color:#444;margin-bottom:4px">🎬 Format dominant : <b>{_fmt_info.get("name", _top_fmt)}</b></div>
+  <div style="font-size:12px;color:#444">🧠 Mécanisme : <b>{_top_mech}</b></div>
+</div>
+""", unsafe_allow_html=True)
+            else:
+                st.caption("Données insuffisantes — scrape plusieurs marques dans différentes sections.")
+
+            st.markdown("---")
+
+            # ── Générateur de brief vidéo ──────────────────────────────────
+            st.markdown("#### 🎬 Générateur de brief vidéo")
+            st.caption("Claude analyse tes top performers et génère un brief complet prêt pour ton équipe de production.")
+            _brief_col1, _brief_col2 = st.columns([2, 2])
+            _brief_objective = _brief_col1.text_input(
+                "Objectif du brief",
+                value="Acquérir de nouveaux clients pet supplement",
+                key="brief_objective",
+            )
+            _run_brief = _brief_col2.button(
+                "🎬 Générer le brief",
+                type="primary",
+                disabled=not api_key or len(transcriptions) < 2,
+                key="run_brief_gen",
+            )
+            _cached_brief = st.session_state.get("_video_brief")
+
+            if _run_brief:
+                with st.spinner("Génération du brief en cours..."):
+                    from product_context import load_context, format_for_prompt as _fprod
+                    _prod_ctx = _fprod(load_context())
+                    _cached_brief = generate_video_brief(transcriptions, api_key, _prod_ctx, _brief_objective)
+                    st.session_state["_video_brief"] = _cached_brief
+
+            if _cached_brief and "error" not in _cached_brief:
+                _brief_concept = _cached_brief.get("concept", "")
+                _brief_hook = _cached_brief.get("hook", {})
+                _brief_struct = _cached_brief.get("structure", [])
+                _brief_fmt = _cached_brief.get("format", "")
+                _brief_casting = _cached_brief.get("casting", "")
+                _brief_music = _cached_brief.get("music_mood", "")
+                _brief_overlays = _cached_brief.get("text_overlays", [])
+                _brief_duration = _cached_brief.get("duration", "")
+                _brief_kpis = _cached_brief.get("kpis_target", {})
+
+                st.markdown(f"""
+<div style="background:#0a0a0a;color:#fff;border-radius:14px;padding:18px 22px;margin-bottom:16px">
+  <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#888;margin-bottom:6px">CONCEPT</div>
+  <div style="font-size:16px;font-weight:800;line-height:1.4">{_brief_concept}</div>
+  <div style="font-size:12px;color:#888;margin-top:8px">Format : <b style="color:#fff">{_brief_fmt}</b> · Durée : <b style="color:#fff">{_brief_duration}</b> · {_cached_brief.get("format_reason","")}</div>
+</div>
+""", unsafe_allow_html=True)
+
+                # Hook
+                if _brief_hook:
+                    st.markdown(f"""
+<div style="background:#f0f8ff;border:2px solid #0a0a0a;border-radius:12px;padding:14px 18px;margin-bottom:12px">
+  <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#888;margin-bottom:6px">🎣 HOOK (0-3s)</div>
+  <div style="font-size:15px;font-weight:800;color:#0a0a0a;font-style:italic">"{_brief_hook.get('script','')}"</div>
+  <div style="font-size:12px;color:#444;margin-top:6px">👁 Visuel : {_brief_hook.get('visual','')}</div>
+  <div style="font-size:12px;color:#444;margin-top:4px">🧠 Mécanisme : {_brief_hook.get('mechanism','')} — {_brief_hook.get('why','')}</div>
+</div>
+""", unsafe_allow_html=True)
+
+                # Structure
+                if _brief_struct:
+                    st.markdown("**📋 Structure narrative**")
+                    for _section in _brief_struct:
+                        with st.expander(_section.get("section", ""), expanded=True):
+                            st.markdown(f"**Script** : *\"{_section.get('script','')}\"*")
+                            st.markdown(f"**Visuel** : {_section.get('visual','')}")
+
+                # Production notes
+                _prod_c1, _prod_c2, _prod_c3 = st.columns(3)
+                if _brief_casting:
+                    _prod_c1.markdown(f"**🎭 Casting**\n\n{_brief_casting}")
+                if _brief_music:
+                    _prod_c2.markdown(f"**🎵 Musique**\n\n{_brief_music}")
+                if _brief_overlays:
+                    _prod_c3.markdown("**📝 Overlays texte**\n\n" + "\n".join(f"• {o}" for o in _brief_overlays))
+
+                # KPIs
+                if _brief_kpis:
+                    est_score = _brief_kpis.get("estimated_hook_score", "?")
+                    hook_rate = _brief_kpis.get("hook_rate_target", "?")
+                    why_works = _brief_kpis.get("why_it_will_work", "")
+                    st.markdown(f"""
+<div style="background:#d4edda;border:1px solid #28a745;border-radius:10px;padding:12px 16px;margin-top:12px">
+  🎯 <b>Objectifs prédits</b> — Hook score estimé : <b>{est_score}/10</b> · Rétention 3s cible : <b>{hook_rate}</b><br>
+  <span style="font-size:12px;color:#155724">{why_works}</span>
+</div>
+""", unsafe_allow_html=True)
+
+                # Export texte
+                _brief_text = f"""BRIEF VIDÉO — METRIC LAB
+========================
+Concept : {_brief_concept}
+Format : {_brief_fmt} | Durée : {_brief_duration}
+
+HOOK (0-3s)
+Script : "{_brief_hook.get('script','')}"
+Visuel : {_brief_hook.get('visual','')}
+Mécanisme : {_brief_hook.get('mechanism','')}
+
+STRUCTURE
+"""
+                for _s in _brief_struct:
+                    _brief_text += f"\n{_s.get('section','')}\nScript : {_s.get('script','')}\nVisuel : {_s.get('visual','')}\n"
+
+                st.download_button(
+                    "📥 Télécharger le brief",
+                    data=_brief_text,
+                    file_name="brief_video_metriclab.txt",
+                    mime="text/plain",
+                    key="dl_brief",
+                )
 
             st.markdown("---")
 
