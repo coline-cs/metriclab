@@ -1,11 +1,11 @@
 [phases.setup]
-nixPkgs = ["ffmpeg", "chromium", "nss", "nspr", "atk", "cups", "gtk3", "alsa-lib"]
+nixPkgs = ["python311", "python311Packages.pip", "ffmpeg", "chromium", "nss", "nspr", "atk", "cups", "gtk3", "alsa-lib"]
 
 [phases.install]
 cmds = [
-  "pip install -r requirements.txt",
-  "playwright install chromium"
+  "python3 -m pip install -r requirements.txt",
+  "python3 -m playwright install chromium"
 ]
 
 [start]
-cmd = "streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableXsrfProtection false"
+cmd = "python3 -m streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableXsrfProtection false"
