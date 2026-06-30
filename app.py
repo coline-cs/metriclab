@@ -255,10 +255,22 @@ div[data-testid="stButtonGroup"] button[kind="segmented_controlActive"] {
 .ml-logo {
     font-family: 'League Spartan', 'Helvetica Neue', Arial, sans-serif;
     font-weight: 900; font-size: 1.85rem; color: #0a0a0a;
-    letter-spacing: -0.03em; line-height: 1;
+    letter-spacing: -0.04em; line-height: 1;
+    display: flex; align-items: center; gap: 10px;
 }
-.ml-logo span { color: #0a0a0a; }
-.ml-tagline { font-size: .75rem; color: #999; font-weight: 500; margin-top: 2px; letter-spacing: .04em; text-transform: uppercase; }
+.ml-plan-badge {
+    font-size: 0.55rem; font-weight: 700; letter-spacing: .06em;
+    background: #0a0a0a; color: #fff;
+    padding: 3px 8px; border-radius: 20px;
+    text-transform: uppercase; vertical-align: middle;
+}
+.ml-tagline { font-size: .72rem; color: #999; font-weight: 500; margin-top: 3px; letter-spacing: .06em; text-transform: uppercase; }
+
+/* ── Titres h3 en League Spartan ── */
+h1, h2, h3 {
+    font-family: 'League Spartan', 'Helvetica Neue', Arial, sans-serif !important;
+    letter-spacing: -0.02em !important;
+}
 
 /* ── Stat cards ── */
 .stat-card {
@@ -365,10 +377,13 @@ h3 { color: #0a0a0a !important; font-weight: 700 !important; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
+_header_user = get_current_user() if AUTH_AVAILABLE else None
+_header_plan = "Admin" if (_header_user and _header_user.get("email") == "chantelouxc@gmail.com") else ("Pro" if _header_user else "")
+_badge_html = f'<span class="ml-plan-badge">{_header_plan}</span>' if _header_plan else ""
+st.markdown(f"""
 <div class="ml-header">
   <div>
-    <div class="ml-logo">metric lab</div>
+    <div class="ml-logo">metric lab {_badge_html}</div>
     <div class="ml-tagline">Intelligence · Analyse · Prédiction</div>
   </div>
 </div>
@@ -381,13 +396,25 @@ with st.sidebar:
     if AUTH_AVAILABLE:
         user = get_current_user()
         if user:
-            st.markdown(f"👤 **{user['email']}**")
+            _initiale = user["email"][0].upper()
+            _email_short = user["email"][:22] + "…" if len(user["email"]) > 22 else user["email"]
+            st.markdown(f"""
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0 12px;">
+                <div style="width:34px;height:34px;border-radius:50%;background:#0a0a0a;color:#fff;
+                    display:flex;align-items:center;justify-content:center;font-weight:700;
+                    font-size:13px;flex-shrink:0;">{_initiale}</div>
+                <div>
+                    <div style="font-size:12px;font-weight:600;color:#0a0a0a;line-height:1.2;">Mon espace</div>
+                    <div style="font-size:11px;color:#999;">{_email_short}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             if st.button("Se déconnecter", use_container_width=True):
                 sign_out()
                 st.rerun()
             st.divider()
 
-    st.markdown("### ⚙️ Configuration")
+    st.markdown("### Configuration")
     _admin_email = "chantelouxc@gmail.com"
     _current_user = get_current_user() if AUTH_AVAILABLE else None
     _is_admin = _current_user and _current_user.get("email") == _admin_email
@@ -408,11 +435,11 @@ with st.sidebar:
             os.environ["ANTHROPIC_API_KEY"] = _clean_key  # actif pour cette session uniquement
 
         if _clean_key.startswith("sk-ant-admin"):
-            st.error("❌ C'est une clé ADMIN — elle ne peut pas appeler les modèles. Crée une clé API standard sur console.anthropic.com → API Keys.")
+            st.error("Clé ADMIN — elle ne peut pas appeler les modèles. Crée une clé standard sur console.anthropic.com → API Keys.")
         elif not _clean_key.startswith("sk-ant-"):
-            st.warning("⚠️ Format inattendu — une clé Anthropic commence par `sk-ant-api...`")
+            st.warning("Format inattendu — une clé Anthropic commence par `sk-ant-api…`")
         else:
-            st.success(f"Clé enregistrée ✓ (…{_clean_key[-4:]})")
+            st.markdown(f'<div style="font-size:11px;color:#059669;padding:4px 0;">Clé active ···{_clean_key[-4:]}</div>', unsafe_allow_html=True)
 
         if st.button("🔌 Tester la clé", key="test_api_key", use_container_width=True):
             try:
@@ -479,19 +506,63 @@ col1, col2, col3, col4, col5, col6 = st.columns(6)
 with col1:
     st.markdown(f'<div class="stat-card"><div class="n">{len(transcriptions)}</div><div class="l">Transcriptions</div></div>', unsafe_allow_html=True)
 with col2:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#f0ad4e">{tops_count}</div><div class="l">🏆 Top Performers</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="n" style="color:#d97706">{tops_count}</div><div class="l">Top performers</div></div>', unsafe_allow_html=True)
 with col3:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#17a2b8">{new_count}</div><div class="l">🆕 Nouvelles Créas</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="n" style="color:#0891b2">{new_count}</div><div class="l">Nouvelles créas</div></div>', unsafe_allow_html=True)
 with col4:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#7c3aed">{vision_count}</div><div class="l">📷 Analysés visuel</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="n" style="color:#7c3aed">{vision_count}</div><div class="l">Analysés visuel</div></div>', unsafe_allow_html=True)
 with col5:
-    score_color = "#28a745" if avg_score and avg_score >= 7 else "#f0ad4e" if avg_score else "#adb5bd"
+    score_color = "#059669" if avg_score and avg_score >= 7 else "#d97706" if avg_score else "#d1d5db"
     score_val = str(avg_score) if avg_score else "—"
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:{score_color}">{score_val}</div><div class="l">⭐ Score moyen</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="n" style="color:{score_color}">{score_val}</div><div class="l">Score moyen</div></div>', unsafe_allow_html=True)
 with col6:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#28a745">{len(gen_files)}</div><div class="l">✍️ Scripts générés</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="stat-card"><div class="n" style="color:#059669">{len(gen_files)}</div><div class="l">Scripts générés</div></div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
+
+# ── Onboarding — affiché uniquement si compte vide sans clé API ──
+_has_api_key = bool(os.environ.get("ANTHROPIC_API_KEY", "").strip())
+_brands_for_onboarding = []
+if BRANDS_AVAILABLE:
+    try:
+        from brands import load_brands as _lb
+        _brands_for_onboarding = _lb()
+    except Exception:
+        pass
+if not _has_api_key or len(_brands_for_onboarding) == 0:
+    _step1_done = _has_api_key
+    _step2_done = len(_brands_for_onboarding) > 0
+    _step3_done = len(transcriptions) > 0
+    def _step_style(done):
+        if done:
+            return "background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;text-align:center;"
+        return "background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px;text-align:center;"
+    def _num_style(done):
+        if done:
+            return "width:22px;height:22px;border-radius:50%;background:#059669;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-bottom:6px;"
+        return "width:22px;height:22px;border-radius:50%;background:#e5e7eb;color:#6b7280;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-bottom:6px;"
+    _check = "✓" if True else ""
+    st.markdown(f"""
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 20px;margin-bottom:16px;">
+        <div style="font-family:'League Spartan',sans-serif;font-weight:700;font-size:13px;color:#0a0a0a;margin-bottom:12px;">
+            Démarrage rapide
+        </div>
+        <div style="display:flex;gap:10px;">
+            <div style="{_step_style(_step1_done)}flex:1;">
+                <div style="{_num_style(_step1_done)}">{"✓" if _step1_done else "1"}</div>
+                <div style="font-size:11px;color:#374151;font-weight:500;line-height:1.4;">Ajouter ta clé<br>Anthropic API</div>
+            </div>
+            <div style="{_step_style(_step2_done)}flex:1;">
+                <div style="{_num_style(_step2_done)}">{"✓" if _step2_done else "2"}</div>
+                <div style="font-size:11px;color:#374151;font-weight:500;line-height:1.4;">Ajouter une<br>marque à surveiller</div>
+            </div>
+            <div style="{_step_style(_step3_done)}flex:1;">
+                <div style="{_num_style(_step3_done)}">{"✓" if _step3_done else "3"}</div>
+                <div style="font-size:11px;color:#374151;font-weight:500;line-height:1.4;">Scraper et<br>analyser les pubs</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ──────────────────────────────────────────────
 # NAVIGATION — pilotable par programme (workflow, fin de scraping...)

@@ -88,36 +88,94 @@ def render_login_page():
     """Affiche la page de connexion / inscription et bloque le reste de l'app."""
     st.markdown("""
     <style>
-    [data-testid="stAppViewContainer"] { background: #0a0a0a; }
-    .auth-card {
-        max-width: 400px;
-        margin: 80px auto 0 auto;
-        background: #111;
-        border: 1px solid #222;
-        border-radius: 12px;
-        padding: 40px 36px 36px 36px;
+    @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&display=swap');
+    [data-testid="stAppViewContainer"] { background: #0a0a0a !important; }
+    [data-testid="stHeader"] { background: transparent !important; }
+    [data-testid="stMainBlockContainer"] { padding-top: 0 !important; }
+
+    .auth-wrap {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 16px;
     }
     .auth-logo {
-        text-align: center;
-        font-size: 1.6rem;
-        font-weight: 700;
-        letter-spacing: -0.5px;
+        font-family: 'League Spartan', sans-serif;
+        font-weight: 900;
+        font-size: 2rem;
+        letter-spacing: -0.04em;
         color: #fff;
-        margin-bottom: 8px;
-    }
-    .auth-sub {
+        margin-bottom: 4px;
         text-align: center;
-        color: #666;
-        font-size: 0.85rem;
-        margin-bottom: 28px;
+    }
+    .auth-tagline {
+        text-align: center;
+        color: #444;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 32px;
+    }
+
+    /* Override Streamlit tab underline bleu */
+    .stTabs [data-baseweb="tab-list"] {
+        background: #1a1a1a !important;
+        border-radius: 8px !important;
+        padding: 3px !important;
+        gap: 2px !important;
+        box-shadow: none !important;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background: transparent !important;
+        color: #555 !important;
+        border-radius: 6px !important;
+        font-size: 0.82rem !important;
+        padding: 6px 14px !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background: #2a2a2a !important;
+        color: #fff !important;
+    }
+
+    /* Inputs dark */
+    .stTextInput input {
+        background: #1a1a1a !important;
+        color: #e0e0e0 !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 8px !important;
+    }
+    .stTextInput input:focus {
+        border-color: #fff !important;
+        box-shadow: none !important;
+    }
+    .stTextInput label {
+        color: #555 !important;
+        font-size: 0.78rem !important;
+    }
+
+    /* Bouton primaire blanc sur noir */
+    .stButton > button[kind="primary"] {
+        background: #ffffff !important;
+        color: #0a0a0a !important;
+        font-weight: 700 !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-size: 0.88rem !important;
+        letter-spacing: -0.01em !important;
+    }
+    .stButton > button[kind="primary"]:hover {
+        background: #e0e0e0 !important;
+        transform: translateY(-1px) !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
     col = st.columns([1, 2, 1])[1]
     with col:
-        st.markdown('<div class="auth-logo">⬛ metric lab</div>', unsafe_allow_html=True)
-        st.markdown('<div class="auth-sub">Connecte-toi à ton espace</div>', unsafe_allow_html=True)
+        st.markdown('<div class="auth-logo">metric lab</div>', unsafe_allow_html=True)
+        st.markdown('<div class="auth-tagline">Intelligence · Analyse · Prédiction</div>', unsafe_allow_html=True)
 
         tab_login, tab_signup = st.tabs(["Connexion", "Créer un compte"])
 
