@@ -374,54 +374,59 @@ h1, h2, h3 {
 .stSlider div[data-testid="stTickBarMin"],
 .stSlider div[data-testid="stTickBarMax"] { color: #999 !important; }
 
-/* ── Mobile responsive ── */
+/* ── Stats grid — CSS natif, responsive sans Streamlit columns ── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+/* ── Mobile ── */
 @media (max-width: 768px) {
-    /* Header plus compact */
-    .ml-logo { font-size: 1.4rem !important; }
-    .ml-tagline { font-size: .65rem !important; }
-    .ml-header { padding: 12px 0 8px !important; }
+    .ml-logo { font-size: 1.35rem !important; }
+    .ml-tagline { font-size: .63rem !important; }
+    .ml-header { padding: 10px 0 8px !important; }
 
-    /* Stats : 3 colonnes sur 2 lignes */
-    [data-testid="stHorizontalBlock"]:has(.stat-card) {
-        flex-wrap: wrap !important;
+    /* Stats : 3 par ligne */
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
     }
-    [data-testid="stHorizontalBlock"]:has(.stat-card) > [data-testid="column"] {
-        min-width: calc(33.33% - 8px) !important;
-        flex: 0 0 calc(33.33% - 8px) !important;
-    }
-    .stat-card { padding: 12px 8px !important; }
-    .stat-card .n { font-size: 1.5rem !important; }
-    .stat-card .l { font-size: .62rem !important; }
+    .stat-card { padding: 12px 6px !important; }
+    .stat-card .n { font-size: 1.45rem !important; }
+    .stat-card .l { font-size: .60rem !important; }
 
-    /* Navigation : scroll horizontal, texte compact */
+    /* Navigation : scroll horizontal */
     div[data-testid="stSegmentedControl"],
     div[data-testid="stButtonGroup"] {
         overflow-x: auto !important;
         flex-wrap: nowrap !important;
-        padding: 4px !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
     }
+    div[data-testid="stSegmentedControl"]::-webkit-scrollbar,
+    div[data-testid="stButtonGroup"]::-webkit-scrollbar { display: none !important; }
     div[data-testid="stSegmentedControl"] button,
     div[data-testid="stButtonGroup"] button {
-        font-size: .75rem !important;
-        padding: 5px 9px !important;
+        font-size: .74rem !important;
+        padding: 5px 10px !important;
         white-space: nowrap !important;
     }
 
-    /* Colonnes formulaires : stack vertical */
-    [data-testid="stHorizontalBlock"]:not(:has(.stat-card)) {
+    /* Colonnes formulaires → stack vertical */
+    [data-testid="stHorizontalBlock"] {
         flex-wrap: wrap !important;
     }
-    [data-testid="stHorizontalBlock"]:not(:has(.stat-card)) > [data-testid="column"] {
+    [data-testid="stHorizontalBlock"] > [data-testid="column"] {
         min-width: 100% !important;
+        flex: 1 1 100% !important;
     }
 
-    /* Onboarding : 3 colonnes maintenues */
-    .ob-steps { gap: 6px !important; }
-
-    /* Main container padding */
+    /* Padding latéral main */
     [data-testid="stMainBlockContainer"] {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
     }
 }
 </style>
@@ -552,21 +557,18 @@ gen_files  = list(GENERATED_DIR.glob("*.txt"))
 scored_entries = [r for r in transcriptions if r.get("scoring") and isinstance(r.get("scoring"), dict) and r["scoring"].get("score_total") is not None]
 avg_score = round(sum(r["scoring"]["score_total"] for r in scored_entries) / len(scored_entries), 1) if scored_entries else None
 
-col1, col2, col3, col4, col5, col6 = st.columns(6)
-with col1:
-    st.markdown(f'<div class="stat-card"><div class="n">{len(transcriptions)}</div><div class="l">Transcriptions</div></div>', unsafe_allow_html=True)
-with col2:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#d97706">{tops_count}</div><div class="l">Top performers</div></div>', unsafe_allow_html=True)
-with col3:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#0891b2">{new_count}</div><div class="l">Nouvelles créas</div></div>', unsafe_allow_html=True)
-with col4:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#7c3aed">{vision_count}</div><div class="l">Analysés visuel</div></div>', unsafe_allow_html=True)
-with col5:
-    score_color = "#059669" if avg_score and avg_score >= 7 else "#d97706" if avg_score else "#d1d5db"
-    score_val = str(avg_score) if avg_score else "—"
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:{score_color}">{score_val}</div><div class="l">Score moyen</div></div>', unsafe_allow_html=True)
-with col6:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#059669">{len(gen_files)}</div><div class="l">Scripts générés</div></div>', unsafe_allow_html=True)
+score_color = "#059669" if avg_score and avg_score >= 7 else "#d97706" if avg_score else "#d1d5db"
+score_val = str(avg_score) if avg_score else "—"
+st.markdown(f"""
+<div class="stats-grid">
+  <div class="stat-card"><div class="n">{len(transcriptions)}</div><div class="l">Transcriptions</div></div>
+  <div class="stat-card"><div class="n" style="color:#d97706">{tops_count}</div><div class="l">Top performers</div></div>
+  <div class="stat-card"><div class="n" style="color:#0891b2">{new_count}</div><div class="l">Nouvelles créas</div></div>
+  <div class="stat-card"><div class="n" style="color:#7c3aed">{vision_count}</div><div class="l">Analysés visuel</div></div>
+  <div class="stat-card"><div class="n" style="color:{score_color}">{score_val}</div><div class="l">Score moyen</div></div>
+  <div class="stat-card"><div class="n" style="color:#059669">{len(gen_files)}</div><div class="l">Scripts générés</div></div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
