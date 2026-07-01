@@ -1060,6 +1060,29 @@ Réponds UNIQUEMENT en JSON valide avec ces clés :
                 else:
                     _body_badge = ""
 
+                # Badge UGC authenticité (uniquement pour le format ugc)
+                _ugc_badge = ""
+                if _ad_fmt == "ugc":
+                    _va = _r.get("visual_analysis") or {}
+                    _auth_score = _va.get("ugc_authenticity_score")
+                    _ugc_type   = _va.get("ugc_type", "")
+                    _ugc_type_labels = {
+                        "testimonial": "Témoignage", "demo_produit": "Démo",
+                        "story_personnelle": "Story", "before_after": "Avant/Après",
+                        "reaction": "Réaction", "aucun": "",
+                    }
+                    _ugc_type_lbl = _ugc_type_labels.get(_ugc_type, _ugc_type)
+                    if _auth_score is not None:
+                        _auth_bg  = "#e8f5e9" if _auth_score >= 7 else ("#fff8e1" if _auth_score >= 4 else "#fce4ec")
+                        _auth_col = "#2e7d32" if _auth_score >= 7 else ("#f57f17" if _auth_score >= 4 else "#c62828")
+                        _ugc_badge = (f'<span style="background:{_auth_bg};color:{_auth_col};border-radius:10px;'
+                                      f'padding:2px 10px;font-size:11px;font-weight:800" title="Score authenticité UGC">'
+                                      f'🙋 {_auth_score}/10{" · " + _ugc_type_lbl if _ugc_type_lbl else ""}</span>')
+                    elif _ugc_type_lbl:
+                        _ugc_badge = (f'<span style="background:#f3e5f5;color:#6a1b9a;border-radius:10px;'
+                                      f'padding:2px 10px;font-size:11px;font-weight:700">'
+                                      f'🙋 {_ugc_type_lbl}</span>')
+
                 # Stats
                 _stat_parts = []
                 if _reach:           _stat_parts.append(f"📡 {_reach} reach EU")
@@ -1078,7 +1101,7 @@ Réponds UNIQUEMENT en JSON valide avec ces clés :
   <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap">
     <span style="background:{_badge_color};border:1px solid {_badge_border};border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700">{_label_icon} {_label} #{_pos}</span>
     <span style="background:{_fmt_color}18;border:1.5px solid {_fmt_color}66;border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;color:{_fmt_color}" title="{_fmt_src_title}">{_fmt_src_icon} {_fmt_name}</span>
-    {_composite_badge}{_hook_badge}{_body_badge}
+    {_composite_badge}{_hook_badge}{_body_badge}{_ugc_badge}
     <span style="color:#bbb;font-size:11px">{_stats_str}</span>
     {"<a href='" + _lib_url + "' target='_blank' style='font-size:11px;color:#666;text-decoration:none'>🔗</a>" if _lib_url else ""}
   </div>
@@ -1593,6 +1616,119 @@ if _nav == "🔬 Intelligence":
 """, unsafe_allow_html=True)
             else:
                 st.caption("Données insuffisantes — scrape plusieurs marques dans différentes sections.")
+
+            st.markdown("---")
+
+            # ── Analytics UGC ──────────────────────────────────────────────
+            st.markdown("#### 🎥 Analytics UGC")
+            st.caption("Performance des vidéos UGC vs autres formats — authenticité, profils créateurs, types de contenu.")
+
+            _ugc_ads  = [r for r in transcriptions if r.get("ad_format") == "ugc"]
+            _non_ugc  = [r for r in transcriptions if r.get("ad_format") != "ugc"]
+
+            if not _ugc_ads:
+                st.info("Aucune pub UGC détectée. Lance la classification IA ou scrape des marques utilisant ce format.")
+            else:
+                _uc1, _uc2, _uc3, _uc4 = st.columns(4)
+
+                _ugc_reaches     = [r.get("eu_reach") for r in _ugc_ads if r.get("eu_reach")]
+                _non_ugc_reaches = [r.get("eu_reach") for r in _non_ugc if r.get("eu_reach")]
+                _ugc_avg_reach   = int(sum(_ugc_reaches) / len(_ugc_reaches)) if _ugc_reaches else None
+                _non_avg_reach   = int(sum(_non_ugc_reaches) / len(_non_ugc_reaches)) if _non_ugc_reaches else None
+
+                _auth_scores = [
+                    (r.get("visual_analysis") or {}).get("ugc_authenticity_score")
+                    for r in _ugc_ads
+                    if (r.get("visual_analysis") or {}).get("ugc_authenticity_score") is not None
+                ]
+                _avg_auth = round(sum(_auth_scores) / len(_auth_scores), 1) if _auth_scores else None
+
+                _ugc_hook_vals = [
+                    (r.get("hook_scoring") or {}).get("stop_scroll_score")
+                    for r in _ugc_ads
+                    if (r.get("hook_scoring") or {}).get("stop_scroll_score") is not None
+                ]
+                _ugc_hook_avg = round(sum(_ugc_hook_vals) / len(_ugc_hook_vals), 1) if _ugc_hook_vals else None
+
+                def _fmt_reach_ugc(v):
+                    if not v: return "N/A"
+                    if v >= 1_000_000: return f"{v/1_000_000:.1f}M"
+                    if v >= 1_000: return f"{v//1_000}k"
+                    return str(v)
+
+                _uc1.metric("Pubs UGC", f"{len(_ugc_ads)} / {len(transcriptions)}")
+                _uc2.metric(
+                    "Reach moyen UGC",
+                    _fmt_reach_ugc(_ugc_avg_reach),
+                    delta=f"vs {_fmt_reach_ugc(_non_avg_reach)} non-UGC" if _ugc_avg_reach and _non_avg_reach else None,
+                )
+                _uc3.metric("Authenticité moy.", f"{_avg_auth}/10" if _avg_auth else "N/A",
+                            help="Score authenticité analysé par Vision IA (0=pro, 10=ultra-naturel)")
+                _uc4.metric("Hook score moy.", f"{_ugc_hook_avg}/10" if _ugc_hook_avg else "N/A")
+
+                # Distribution types, genre créateur, style tournage
+                _ugc_types, _creator_genders, _filming_styles = {}, {}, {}
+                for _ur in _ugc_ads:
+                    _va = _ur.get("visual_analysis") or {}
+                    _t  = _va.get("ugc_type") or "inconnu"
+                    _ugc_types[_t] = _ugc_types.get(_t, 0) + 1
+                    _g  = (_va.get("creator_profile") or {}).get("gender") or "inconnu"
+                    _creator_genders[_g] = _creator_genders.get(_g, 0) + 1
+                    _fs = _va.get("filming_style") or "inconnu"
+                    _filming_styles[_fs] = _filming_styles.get(_fs, 0) + 1
+
+                _ugc_type_labels = {
+                    "testimonial": "💬 Témoignage", "demo_produit": "🧴 Démo produit",
+                    "story_personnelle": "📖 Story perso", "before_after": "✨ Avant/Après",
+                    "reaction": "😮 Réaction", "aucun": "—", "inconnu": "?",
+                }
+                _style_labels = {
+                    "selfie": "📱 Selfie", "stabilise": "🤳 Stabilisé",
+                    "tripod": "📷 Trépied", "professionnel": "🎥 Pro",
+                }
+
+                _ud1, _ud2, _ud3 = st.columns(3)
+                with _ud1:
+                    st.markdown("**Type de contenu**")
+                    for _t, _cnt in sorted(_ugc_types.items(), key=lambda x: -x[1]):
+                        st.markdown(f"{_ugc_type_labels.get(_t, _t)} · **{_cnt}**")
+                with _ud2:
+                    st.markdown("**Profil créateur**")
+                    _gender_icons = {"femme": "👩", "homme": "👨", "inconnu": "🎭"}
+                    for _g, _cnt in sorted(_creator_genders.items(), key=lambda x: -x[1]):
+                        st.markdown(f"{_gender_icons.get(_g,'👤')} {_g.capitalize()} · **{_cnt}**")
+                with _ud3:
+                    st.markdown("**Style de tournage**")
+                    for _fs, _cnt in sorted(_filming_styles.items(), key=lambda x: -x[1]):
+                        st.markdown(f"{_style_labels.get(_fs, _fs)} · **{_cnt}**")
+
+                # Top UGC par reach
+                _ugc_top3 = sorted(_ugc_ads, key=lambda r: r.get("eu_reach") or 0, reverse=True)[:3]
+                if _ugc_top3:
+                    st.markdown("**🏆 Top UGC par reach EU**")
+                    for _ur in _ugc_top3:
+                        _ur_va    = _ur.get("visual_analysis") or {}
+                        _ur_auth  = _ur_va.get("ugc_authenticity_score")
+                        _ur_type  = _ugc_type_labels.get(_ur_va.get("ugc_type",""), "")
+                        _ur_brand = _ur.get("page_name") or "?"
+                        _ur_hook  = (_ur.get("transcript") or "")[:75].strip()
+                        _ur_r_str = _fmt_reach_ugc(_ur.get("eu_reach"))
+                        _ur_id    = _ur.get("ad_id") or ""
+                        _ur_link  = f"https://www.facebook.com/ads/library/?id={_ur_id}" if _ur_id else None
+                        _auth_badge = (f'<span style="background:#f3e5f5;color:#6a1b9a;border-radius:8px;'
+                                       f'padding:1px 8px;font-size:11px;font-weight:700">🙋 {_ur_auth}/10</span>') if _ur_auth is not None else ""
+                        _type_badge = (f'<span style="background:#e3f2fd;color:#1565c0;border-radius:8px;'
+                                       f'padding:1px 8px;font-size:11px">{_ur_type}</span>') if _ur_type else ""
+                        _lib_link   = (f'<a href="{_ur_link}" target="_blank" style="font-size:11px;color:#666;text-decoration:none">🔗</a>') if _ur_link else ""
+                        st.markdown(f"""<div style="background:#fff;border:1px solid #e0e0e0;border-radius:10px;padding:10px 14px;margin-bottom:8px">
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;flex-wrap:wrap">
+    <span style="font-weight:700;font-size:13px">{_ur_brand}</span>
+    {_auth_badge}{_type_badge}
+    <span style="font-size:11px;color:#888">📡 {_ur_r_str} reach EU</span>
+    {_lib_link}
+  </div>
+  <div style="font-size:12.5px;color:#555;font-style:italic">"{_ur_hook}..."</div>
+</div>""", unsafe_allow_html=True)
 
             st.markdown("---")
 

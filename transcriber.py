@@ -357,7 +357,12 @@ def analyze_frames_visually(frames: list[Path], api_key: str) -> dict:
             '  "text_overlays": ["textes lisibles à l écran"],\n'
             '  "product_visible": true/false,\n'
             '  "visual_style": "description du style en 8 mots max",\n'
-            '  "production_quality": "amateur|semi-pro|pro|ia_generee"\n'
+            '  "production_quality": "amateur|semi-pro|pro|ia_generee",\n'
+            '  "ugc_authenticity_score": 0-10,\n'
+            '  "ugc_type": "testimonial|demo_produit|story_personnelle|before_after|reaction|aucun",\n'
+            '  "creator_profile": {"age_range": "18-25|25-35|35-50|50+|inconnu", "gender": "femme|homme|inconnu", "energy": "dynamique|calme|neutre"},\n'
+            '  "filming_style": "selfie|stabilise|tripod|professionnel",\n'
+            '  "background_type": "maison|exterieur|studio|bureau|autre"\n'
             '}\n\n'
             'Formats possibles :\n'
             '- ugc: particulier filmé par lui-même (qualité amateur, selfie)\n'
@@ -368,7 +373,11 @@ def analyze_frames_visually(frames: list[Path], api_key: str) -> dict:
             '- animated: dessin animé, cartoon, motion design\n'
             '- demo: démonstration produit\n'
             '- talking_head: expert face caméra, éclairage pro\n'
-            '- pov: point de vue animal ou personnage non humain'
+            '- pov: point de vue animal ou personnage non humain\n\n'
+            'Champs UGC (remplis pour tous les formats) :\n'
+            '- ugc_authenticity_score: 0=pro/IA, 8-10=tournage maison ultra-naturel\n'
+            '- ugc_type: testimonial=témoignage direct, demo_produit=montre le produit en main, story_personnelle=raconte une expérience, before_after=avant/après visible, reaction=réaction face caméra\n'
+            '- filming_style: selfie=tenu à la main face soi, stabilise=tenu mais cadré, tripod=fixe sur pied, professionnel=rig/éclairage'
         ),
     })
 
@@ -376,7 +385,7 @@ def analyze_frames_visually(frames: list[Path], api_key: str) -> dict:
         client = _ant.Anthropic(api_key=api_key)
         response = client.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=500,
+            max_tokens=800,
             messages=[{"role": "user", "content": content}],
         )
         text = response.content[0].text.strip()
