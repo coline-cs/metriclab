@@ -79,65 +79,78 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;800;900&display=swap');
 
-/* ── Base ── */
-html, body, [data-testid="stAppViewContainer"] {
-    background: #f5f5f5 !important;
-    color: #0a0a0a !important;
+/* ── BASE DARK ── */
+html, body,
+[data-testid="stAppViewContainer"],
+[data-testid="stApp"],
+.stApp {
+    background: #0c0c0c !important;
+    color: #e0e0e0 !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif !important;
 }
-[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
-[data-testid="stMainBlockContainer"] { padding-top: 0 !important; }
+[data-testid="stHeader"] { background: #0c0c0c !important; box-shadow: none !important; }
+[data-testid="stMainBlockContainer"] { padding-top: 0 !important; background: #0c0c0c !important; }
+[data-testid="stBottom"] { background: #0c0c0c !important; }
+section[data-testid="stSidebar"] > div { background: #111 !important; }
 
 /* ── Labels ── */
 label, .stTextInput label, .stTextArea label,
 .stSelectbox label, .stSlider label,
 div[data-testid="stWidgetLabel"] p,
 div[data-testid="stWidgetLabel"] {
-    color: #0a0a0a !important;
-    font-weight: 600 !important;
-    font-size: .88rem !important;
+    color: #888 !important;
+    font-weight: 500 !important;
+    font-size: .82rem !important;
     letter-spacing: .01em !important;
 }
+p, li, span { color: #c0c0c0 !important; }
 
 /* ── Inputs ── */
 input, textarea, .stTextInput input, .stTextArea textarea {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #2a2a2a !important;
     border-radius: 10px !important;
     font-size: .9rem !important;
 }
 input:focus, textarea:focus {
-    border-color: #0a0a0a !important;
-    box-shadow: 0 0 0 3px rgba(10,10,10,.08) !important;
+    border-color: #fff !important;
+    box-shadow: none !important;
 }
-input::placeholder, textarea::placeholder { color: #b0b0b0 !important; }
+input::placeholder, textarea::placeholder { color: #444 !important; }
 
 /* ── Selectbox ── */
 .stSelectbox div[data-baseweb="select"] > div {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #2a2a2a !important;
     border-radius: 10px !important;
 }
+[data-baseweb="popover"], [data-baseweb="menu"] {
+    background: #1a1a1a !important;
+    border: 1px solid #2a2a2a !important;
+}
+[role="option"] { background: #1a1a1a !important; color: #e0e0e0 !important; }
+[role="option"]:hover { background: #252525 !important; }
 
 /* ── Navigation principale ── */
 div[data-testid="stSegmentedControl"],
 div[data-testid="stButtonGroup"] {
-    background: #ffffff !important;
-    border-radius: 14px !important;
-    padding: 5px 6px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04) !important;
+    background: #1a1a1a !important;
+    border-radius: 12px !important;
+    padding: 4px 5px !important;
+    border: 1px solid #222 !important;
+    box-shadow: none !important;
     gap: 2px !important;
     overflow-x: auto !important;
 }
 div[data-testid="stSegmentedControl"] button,
 div[data-testid="stButtonGroup"] button {
-    border-radius: 9px !important;
+    border-radius: 8px !important;
     font-weight: 500 !important;
     font-size: .81rem !important;
     border: none !important;
-    color: #666 !important;
+    color: #555 !important;
     background: transparent !important;
     transition: all 0.12s ease !important;
     white-space: nowrap !important;
@@ -145,232 +158,227 @@ div[data-testid="stButtonGroup"] button {
 }
 div[data-testid="stSegmentedControl"] button:hover,
 div[data-testid="stButtonGroup"] button:hover {
-    background: #f0f0f0 !important;
-    color: #0a0a0a !important;
+    background: #252525 !important;
+    color: #ccc !important;
 }
 div[data-testid="stSegmentedControl"] button[aria-checked="true"],
 div[data-testid="stButtonGroup"] button[aria-checked="true"],
 div[data-testid="stSegmentedControl"] button[kind="segmented_controlActive"],
 div[data-testid="stButtonGroup"] button[kind="segmented_controlActive"] {
-    background: #0a0a0a !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,.20) !important;
+    background: #fff !important;
+    color: #0c0c0c !important;
+    box-shadow: none !important;
 }
 
 /* ── Onglets ── */
 .stTabs [data-baseweb="tab-list"] {
-    background: #ffffff !important;
+    background: #1a1a1a !important;
     border-radius: 10px !important;
-    padding: 4px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.07) !important;
-    gap: 3px !important;
+    padding: 3px !important;
+    box-shadow: none !important;
+    border: 1px solid #222 !important;
+    gap: 2px !important;
 }
 .stTabs [data-baseweb="tab"] {
     background: transparent !important;
-    color: #666 !important;
+    color: #555 !important;
     border-radius: 7px !important;
     font-weight: 500 !important;
     padding: 7px 14px !important;
 }
 .stTabs [aria-selected="true"] {
-    background: #0a0a0a !important;
-    color: #ffffff !important;
+    background: #fff !important;
+    color: #0c0c0c !important;
 }
 
-/* ── Boutons primaires ── */
+/* ── Boutons ── */
 .stButton > button {
-    border-radius: 10px !important;
+    border-radius: 9px !important;
     font-weight: 600 !important;
-    font-size: .88rem !important;
+    font-size: .85rem !important;
     border: none !important;
     transition: all 0.12s ease !important;
     cursor: pointer !important;
     letter-spacing: .01em !important;
 }
 .stButton > button[kind="primary"] {
-    background: #0a0a0a !important;
-    color: #ffffff !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.15) !important;
+    background: #ffffff !important;
+    color: #0c0c0c !important;
 }
 .stButton > button[kind="primary"]:hover {
-    background: #222 !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,.22) !important;
+    background: #e0e0e0 !important;
     transform: translateY(-1px) !important;
 }
-.stButton > button[kind="primary"]:active { transform: translateY(0) !important; }
 .stButton > button:not([kind="primary"]) {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #c0c0c0 !important;
+    border: 1px solid #2a2a2a !important;
 }
 .stButton > button:not([kind="primary"]):hover {
-    background: #f5f5f5 !important;
-    border-color: #0a0a0a !important;
+    background: #252525 !important;
+    border-color: #444 !important;
     transform: translateY(-1px) !important;
 }
-.stButton > button:disabled {
-    opacity: 0.35 !important;
-    cursor: not-allowed !important;
-    transform: none !important;
-    box-shadow: none !important;
-}
+.stButton > button:disabled { opacity: 0.25 !important; transform: none !important; }
 
 /* ── Download button ── */
 .stDownloadButton > button {
-    border-radius: 10px !important;
+    border-radius: 9px !important;
     font-weight: 600 !important;
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #c0c0c0 !important;
+    border: 1px solid #2a2a2a !important;
     transition: all 0.12s ease !important;
 }
 .stDownloadButton > button:hover {
-    background: #0a0a0a !important;
-    color: #fff !important;
-    border-color: #0a0a0a !important;
-    transform: translateY(-1px) !important;
+    background: #fff !important;
+    color: #0c0c0c !important;
+    border-color: #fff !important;
 }
 
 /* ── Expander ── */
 .streamlit-expanderHeader {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1px solid #e8e8e8 !important;
+    background: #1a1a1a !important;
+    color: #c0c0c0 !important;
+    border: 1px solid #2a2a2a !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
-    transition: background 0.12s ease !important;
 }
-.streamlit-expanderHeader:hover { background: #f9f9f9 !important; }
+.streamlit-expanderHeader:hover { background: #202020 !important; }
+.streamlit-expanderContent { background: #141414 !important; border: 1px solid #2a2a2a !important; }
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
-    background: #ffffff !important;
-    border-right: 1px solid #ebebeb !important;
+    background: #111 !important;
+    border-right: 1px solid #1e1e1e !important;
 }
+[data-testid="stSidebar"] * { color: #888 !important; }
+[data-testid="stSidebar"] h1,[data-testid="stSidebar"] h2,[data-testid="stSidebar"] h3 { color: #e0e0e0 !important; }
+
+/* ── Alerts / info boxes ── */
+[data-testid="stAlert"] { background: #1a1a1a !important; border: 1px solid #2a2a2a !important; color: #c0c0c0 !important; border-radius: 10px !important; }
+.stSuccess { background: #0d1f0d !important; border-color: #1a3a1a !important; }
+.stError { background: #1f0d0d !important; border-color: #3a1a1a !important; }
+.stWarning { background: #1f190d !important; border-color: #3a300a !important; }
 
 /* ── Header metric lab ── */
 .ml-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 18px 0 12px; margin-bottom: 4px;
-    border-bottom: 1px solid #ebebeb;
+    border-bottom: 1px solid #1e1e1e;
 }
 .ml-logo {
     font-family: 'League Spartan', 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 900; font-size: 1.85rem; color: #0a0a0a;
+    font-weight: 900; font-size: 1.85rem; color: #fff;
     letter-spacing: -0.04em; line-height: 1;
     display: flex; align-items: center; gap: 10px;
 }
 .ml-plan-badge {
-    font-size: 0.55rem; font-weight: 700; letter-spacing: .06em;
-    background: #0a0a0a; color: #fff;
+    font-size: 0.52rem; font-weight: 700; letter-spacing: .06em;
+    background: #fff; color: #0c0c0c;
     padding: 3px 8px; border-radius: 20px;
     text-transform: uppercase; vertical-align: middle;
 }
-.ml-tagline { font-size: .72rem; color: #999; font-weight: 500; margin-top: 3px; letter-spacing: .06em; text-transform: uppercase; }
+.ml-tagline { font-size: .70rem; color: #444; font-weight: 500; margin-top: 3px; letter-spacing: .06em; text-transform: uppercase; }
 
-/* ── Titres h3 en League Spartan ── */
+/* ── Titres ── */
 h1, h2, h3 {
     font-family: 'League Spartan', 'Helvetica Neue', Arial, sans-serif !important;
     letter-spacing: -0.02em !important;
+    color: #fff !important;
 }
 
 /* ── Stat cards ── */
 .stat-card {
-    background: #ffffff; border-radius: 14px; padding: 18px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
-    text-align: center; transition: all 0.15s ease; cursor: default;
+    background: #1a1a1a; border-radius: 12px; padding: 16px 12px;
+    border: 1px solid #222;
+    text-align: center; transition: border-color 0.15s ease; cursor: default;
 }
-.stat-card:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,.09), 0 0 0 1px rgba(0,0,0,.06);
-    transform: translateY(-2px);
-}
-.stat-card .n { font-size: 2rem; font-weight: 800; color: #0a0a0a; line-height: 1; }
-.stat-card .l { font-size: .72rem; color: #999; margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+.stat-card:hover { border-color: #333; }
+.stat-card .n { font-size: 1.9rem; font-weight: 800; color: #fff; line-height: 1; }
+.stat-card .l { font-size: .68rem; color: #444; margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
 
 /* ── Brand row ── */
 .brand-row {
-    background: #ffffff; border-radius: 12px; border-left: 3px solid #0a0a0a;
-    padding: 14px 18px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.03);
+    background: #141414; border-radius: 10px; border-left: 2px solid #fff;
+    padding: 14px 18px; border-top: 1px solid #1e1e1e;
+    border-right: 1px solid #1e1e1e; border-bottom: 1px solid #1e1e1e;
+    margin-bottom: 6px;
 }
-.brand-row-name { font-size: .95rem; font-weight: 700; color: #0a0a0a; margin-bottom: 5px; }
-.brand-row-meta { display: flex; gap: 12px; font-size: .76rem; color: #888; flex-wrap: wrap; }
+.brand-row-name { font-size: .95rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.brand-row-meta { display: flex; gap: 12px; font-size: .74rem; color: #444; flex-wrap: wrap; }
 .brand-row-meta span { display: inline-flex; align-items: center; gap: 3px; }
 
 /* ── Workflow steps ── */
 .wf-bar {
     display: flex; align-items: center; gap: 0;
-    background: #ffffff; border-radius: 14px;
+    background: #141414; border-radius: 12px;
     padding: 12px 20px; margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+    border: 1px solid #1e1e1e;
 }
 .wf-step {
     flex: 1; text-align: center; padding: 8px 6px;
     border-radius: 8px; font-size: .8rem; font-weight: 500;
-    color: #bbb; background: transparent; transition: .15s;
+    color: #333; background: transparent; transition: .15s;
 }
 .wf-step .wf-n {
     display: inline-flex; align-items: center; justify-content: center;
     width: 22px; height: 22px; border-radius: 50%; font-size: .7rem;
     font-weight: 700; margin-right: 6px;
-    background: #ebebeb; color: #999;
+    background: #222; color: #555;
 }
-.wf-step.wf-done { color: #2d7a47; }
-.wf-step.wf-done .wf-n { background: #d4edda; color: #155724; }
-.wf-step.wf-active { color: #0a0a0a; font-weight: 700; }
-.wf-step.wf-active .wf-n { background: #0a0a0a; color: #fff; }
-.wf-arrow { color: #d8d8d8; font-size: 1.1rem; padding: 0 4px; }
+.wf-step.wf-done { color: #34d399; }
+.wf-step.wf-done .wf-n { background: #052e16; color: #34d399; }
+.wf-step.wf-active { color: #fff; font-weight: 700; }
+.wf-step.wf-active .wf-n { background: #fff; color: #0c0c0c; }
+.wf-arrow { color: #2a2a2a; font-size: 1.1rem; padding: 0 4px; }
 
 /* ── Context pills ── */
 .context-pill {
     display: inline-flex; align-items: center; gap: 5px;
-    background: #f0f0f0; color: #0a0a0a; border-radius: 20px;
+    background: #1a1a1a; color: #c0c0c0; border-radius: 20px;
     padding: 4px 12px; font-size: .74rem; font-weight: 600; margin: 3px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #2a2a2a;
 }
-.context-pill.green { background: #f0fff4; color: #2d7a47; border-color: #b2e8c5; }
-.context-pill.orange { background: #fff8e6; color: #7a5a00; border-color: #ffd88a; }
-.context-pill.grey { background: #f5f5f5; color: #888; border-color: #e0e0e0; }
+.context-pill.green { background: #052e16; color: #34d399; border-color: #064e3b; }
+.context-pill.orange { background: #1c1400; color: #fbbf24; border-color: #2d2000; }
+.context-pill.grey { background: #1a1a1a; color: #555; border-color: #222; }
 
 /* ── Suggestion pills ── */
 .suggestion-pill {
     display: inline-block; padding: 7px 15px; margin: 3px;
-    background: #fff; border: 1.5px solid #e0e0e0;
-    border-radius: 20px; font-size: .81rem; color: #333;
+    background: #1a1a1a; border: 1px solid #2a2a2a;
+    border-radius: 20px; font-size: .81rem; color: #888;
     cursor: pointer; transition: all 0.12s ease; user-select: none;
 }
 .suggestion-pill:hover {
-    border-color: #0a0a0a; color: #0a0a0a;
-    background: #f5f5f5; transform: translateY(-1px);
+    border-color: #fff; color: #fff;
+    background: #222; transform: translateY(-1px);
 }
 
 /* ── Chat ── */
 [data-testid="stChatMessage"] {
-    background: #ffffff !important;
+    background: #141414 !important;
     border-radius: 12px !important;
-    border: 1px solid #ebebeb !important;
+    border: 1px solid #1e1e1e !important;
     margin-bottom: 8px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.04) !important;
 }
 [data-testid="stChatInput"] textarea {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #2a2a2a !important;
     border-radius: 10px !important;
 }
-[data-testid="stChatInput"] textarea:focus {
-    border-color: #0a0a0a !important;
-    box-shadow: 0 0 0 3px rgba(10,10,10,.08) !important;
-}
+[data-testid="stChatInput"] textarea:focus { border-color: #fff !important; }
 
 /* ── Empty state ── */
 .empty-state-box {
-    text-align: center; padding: 52px 24px; background: #ffffff;
-    border-radius: 14px; border: 2px dashed #e0e0e0; color: #888; margin-top: 8px;
+    text-align: center; padding: 52px 24px; background: #141414;
+    border-radius: 14px; border: 1px dashed #2a2a2a; color: #444; margin-top: 8px;
 }
-.ebox-icon { font-size: 2.4rem; margin-bottom: 12px; }
-.ebox-title { font-size: 1rem; font-weight: 700; color: #0a0a0a; margin-bottom: 6px; }
-.ebox-sub { font-size: .84rem; }
+.ebox-icon { font-size: 2rem; margin-bottom: 12px; color: #333; }
+.ebox-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.ebox-sub { font-size: .84rem; color: #444; }
 
 /* ── Slider ── */
 .stSlider div[data-testid="stTickBarMin"],
