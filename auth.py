@@ -43,9 +43,12 @@ def _save_session_to_storage(session) -> None:
         components.html(f"""
         <script>
         try {{
-            localStorage.setItem('ml_at', '{at}');
-            localStorage.setItem('ml_rt', '{rt}');
-        }} catch(e) {{}}
+            var store = window.parent ? window.parent.localStorage : localStorage;
+            store.setItem('ml_at', '{at}');
+            store.setItem('ml_rt', '{rt}');
+        }} catch(e) {{
+            try {{ localStorage.setItem('ml_at', '{at}'); localStorage.setItem('ml_rt', '{rt}'); }} catch(e2) {{}}
+        }}
         </script>
         """, height=0, scrolling=False)
     except Exception:
@@ -57,9 +60,12 @@ def _clear_storage() -> None:
     components.html("""
     <script>
     try {
-        localStorage.removeItem('ml_at');
-        localStorage.removeItem('ml_rt');
-    } catch(e) {}
+        var store = window.parent ? window.parent.localStorage : localStorage;
+        store.removeItem('ml_at');
+        store.removeItem('ml_rt');
+    } catch(e) {
+        try { localStorage.removeItem('ml_at'); localStorage.removeItem('ml_rt'); } catch(e2) {}
+    }
     </script>
     """, height=0, scrolling=False)
 
@@ -82,8 +88,13 @@ def try_restore_session() -> bool:
         <script>
         (function() {
             try {
-                var at = localStorage.getItem('ml_at');
-                var rt = localStorage.getItem('ml_rt');
+                var store = window.parent ? window.parent.localStorage : localStorage;
+                var at = store.getItem('ml_at');
+                var rt = store.getItem('ml_rt');
+                if (!at || !rt) {
+                    at = localStorage.getItem('ml_at');
+                    rt = localStorage.getItem('ml_rt');
+                }
                 if (at && rt) {
                     var url = new URL(window.parent.location.href);
                     if (!url.searchParams.get('_ml_at')) {
