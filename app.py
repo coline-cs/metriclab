@@ -15,7 +15,7 @@ import streamlit as st
 
 # Auth — doit être importé avant st.set_page_config
 try:
-    from auth import get_current_user, get_current_user_id, render_login_page, sign_out
+    from auth import get_current_user, get_current_user_id, render_login_page, sign_out, try_restore_session
     AUTH_AVAILABLE = True
 except ImportError:
     AUTH_AVAILABLE = False
@@ -70,6 +70,8 @@ st.set_page_config(
 
 # ── Auth gate ────────────────────────────────
 if AUTH_AVAILABLE:
+    if not get_current_user():
+        try_restore_session()  # tente de restaurer depuis localStorage
     if not get_current_user():
         render_login_page()
 
@@ -384,37 +386,49 @@ h1, h2, h3 {
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-    .ml-logo { font-size: 1.35rem !important; }
-    .ml-tagline { font-size: .63rem !important; }
-    .ml-header { padding: 10px 0 8px !important; }
+    /* Header ultra compact */
+    .ml-logo { font-size: 1.2rem !important; }
+    .ml-tagline { display: none !important; }
+    .ml-header { padding: 8px 0 6px !important; border-bottom: none !important; }
+    .ml-plan-badge { font-size: 0.48rem !important; padding: 2px 6px !important; }
 
-    /* Stats : 3 par ligne */
+    /* Stats : 3 par ligne, ultra compact */
     .stats-grid {
         grid-template-columns: repeat(3, 1fr) !important;
-        gap: 8px !important;
+        gap: 6px !important;
+        margin-bottom: 8px !important;
     }
-    .stat-card { padding: 12px 6px !important; }
-    .stat-card .n { font-size: 1.45rem !important; }
-    .stat-card .l { font-size: .60rem !important; }
+    .stat-card {
+        padding: 10px 4px !important;
+        border-radius: 10px !important;
+    }
+    .stat-card .n { font-size: 1.3rem !important; }
+    .stat-card .l {
+        font-size: .56rem !important;
+        margin-top: 3px !important;
+        letter-spacing: .02em !important;
+    }
+    .stat-card:hover { transform: none !important; }
 
-    /* Navigation : scroll horizontal */
+    /* Navigation : scroll horizontal invisible */
     div[data-testid="stSegmentedControl"],
     div[data-testid="stButtonGroup"] {
         overflow-x: auto !important;
         flex-wrap: nowrap !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none !important;
+        padding: 3px !important;
     }
     div[data-testid="stSegmentedControl"]::-webkit-scrollbar,
     div[data-testid="stButtonGroup"]::-webkit-scrollbar { display: none !important; }
     div[data-testid="stSegmentedControl"] button,
     div[data-testid="stButtonGroup"] button {
-        font-size: .74rem !important;
-        padding: 5px 10px !important;
+        font-size: .72rem !important;
+        padding: 4px 9px !important;
         white-space: nowrap !important;
     }
 
-    /* Colonnes formulaires → stack vertical */
+    /* Colonnes formulaires → stack */
     [data-testid="stHorizontalBlock"] {
         flex-wrap: wrap !important;
     }
@@ -423,11 +437,19 @@ h1, h2, h3 {
         flex: 1 1 100% !important;
     }
 
-    /* Padding latéral main */
+    /* Onboarding compact */
+    .ob-steps { gap: 5px !important; }
+
+    /* Padding latéral */
     [data-testid="stMainBlockContainer"] {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        padding-top: 4px !important;
     }
+
+    /* Brand rows */
+    .brand-row { padding: 10px 12px !important; }
+    .brand-row-name { font-size: .88rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)

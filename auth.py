@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
 Authentification Supabase Auth — login / signup / logout.
+Session persistante via localStorage (survit aux rechargements de page).
 """
 import os
 import streamlit as st
+import streamlit.components.v1 as components
 from supabase import create_client, Client
 
 _auth_client: Client | None = None
@@ -31,6 +33,96 @@ def get_current_user_id() -> str | None:
     return user["id"] if user else None
 
 
+def _save_session_to_storage(session) -> None:
+    """Sauvegarde les tokens Supabase dans le localStorage du navigateur."""
+    if not session:
+        return
+    try:
+        at = session.access_token or ""
+        rt = session.refresh_token or ""
+        components.html(f"""
+        <script>
+        try {{
+            localStorage.setItem('ml_at', '{at}');
+            localStorage.setItem('ml_rt', '{rt}');
+        }} catch(e) {{}}
+        </script>
+        """, height=0, scrolling=False)
+    except Exception:
+        pass
+
+
+def _clear_storage() -> None:
+    """Efface les tokens du localStorage."""
+    components.html("""
+    <script>
+    try {
+        localStorage.removeItem('ml_at');
+        localStorage.removeItem('ml_rt');
+    } catch(e) {}
+    </script>
+    """, height=0, scrolling=False)
+
+
+def try_restore_session() -> bool:
+    """
+    Tente de restaurer la session depuis les query params (injectés par JS).
+    À appeler UNE FOIS au démarrage de l'app, avant le gate de login.
+    Retourne True si une session a été restaurée.
+    """
+    if st.session_state.get("_auth_user"):
+        return True
+
+    at = st.query_params.get("_ml_at", "")
+    rt = st.query_params.get("_ml_rt", "")
+
+    if not at or not rt:
+        # Injecter le JS qui lit le localStorage et recharge avec les params
+        components.html("""
+        <script>
+        (function() {
+            try {
+                var at = localStorage.getItem('ml_at');
+                var rt = localStorage.getItem('ml_rt');
+                if (at && rt) {
+                    var url = new URL(window.parent.location.href);
+                    if (!url.searchParams.get('_ml_at')) {
+                        url.searchParams.set('_ml_at', at);
+                        url.searchParams.set('_ml_rt', rt);
+                        window.parent.location.replace(url.toString());
+                    }
+                }
+            } catch(e) {}
+        })();
+        </script>
+        """, height=0, scrolling=False)
+        return False
+
+    # On a les tokens — restaurer la session Supabase
+    client = _get_client()
+    if not client:
+        return False
+    try:
+        res = client.auth.set_session(at, rt)
+        if res and res.user:
+            st.session_state["_auth_user"] = {
+                "id": res.user.id,
+                "email": res.user.email,
+            }
+            st.session_state["_auth_session"] = res.session
+            # Nettoyer les params de l'URL
+            st.query_params.clear()
+            return True
+    except Exception:
+        # Token expiré ou invalide → nettoyer le localStorage
+        _clear_storage()
+        try:
+            st.query_params.clear()
+        except Exception:
+            pass
+    return False
+
+
 def sign_up(email: str, password: str) -> tuple[bool, str]:
     client = _get_client()
     if not client:
@@ -43,6 +135,7 @@ def sign_up(email: str, password: str) -> tuple[bool, str]:
                 "email": res.user.email,
             }
             st.session_state["_auth_session"] = res.session
+            _save_session_to_storage(res.session)
             return True, ""
         return False, "Inscription échouée."
     except Exception as e:
@@ -64,6 +157,7 @@ def sign_in(email: str, password: str) -> tuple[bool, str]:
                 "email": res.user.email,
             }
             st.session_state["_auth_session"] = res.session
+            _save_session_to_storage(res.session)
             return True, ""
         return False, "Email ou mot de passe incorrect."
     except Exception as e:
@@ -82,6 +176,7 @@ def sign_out():
             pass
     st.session_state.pop("_auth_user", None)
     st.session_state.pop("_auth_session", None)
+    _clear_storage()
 
 
 def render_login_page():
