@@ -825,15 +825,12 @@ if _nav == "🏢 Marques":
                              disabled=not (_new_name.strip() and _new_url.strip())):
                     _add_tags = _add_perf + _add_niches
                     _add_label = _add_perf[0] if _add_perf else (_add_niches[0] if _add_niches else "")
-                    add_brand(_new_name, _new_url, _add_label)
-                    # Sauvegarder les tags
-                    _all_b = load_brands()
-                    for _b in _all_b:
-                        if _b["name"] == _new_name.strip():
-                            _b["tags"] = _add_tags
-                    save_brands(_all_b)
-                    st.success(f"✅ **{_new_name}** ajoutée !")
-                    st.rerun()
+                    try:
+                        add_brand(_new_name, _new_url, _add_label, tags=_add_tags)
+                        st.success(f"✅ **{_new_name}** ajoutée !")
+                        st.rerun()
+                    except Exception as _e_add:
+                        st.error(f"Erreur sauvegarde : {_e_add}")
 
             st.markdown("<br>", unsafe_allow_html=True)
 

@@ -44,10 +44,25 @@ def _get_authed_client():
     try:
         import streamlit as st
         session = st.session_state.get("_auth_session")
-        if session and hasattr(session, "access_token") and session.access_token:
-            client.postgrest.auth(session.access_token)
-        elif session and isinstance(session, dict) and session.get("access_token"):
-            client.postgrest.auth(session["access_token"])
+        at, rt = None, None
+        if session:
+            if hasattr(session, "access_token"):
+                at = session.access_token
+                rt = getattr(session, "refresh_token", "") or ""
+            elif isinstance(session, dict):
+                at = session.get("access_token", "")
+                rt = session.get("refresh_token", "") or ""
+        if at:
+            # Méthode officielle supabase-py v2 : set_session propage l'auth à PostgREST
+            try:
+                client.auth.set_session(at, rt)
+            except Exception:
+                pass
+            # Fallback : setter direct sur le client postgrest
+            try:
+                client.postgrest.auth(at)
+            except Exception:
+                pass
     except Exception:
         pass
     return client
@@ -98,18 +113,10 @@ def upsert_brand(brand: dict) -> dict:
     client = _get_authed_client()
     uid = _uid()
     if client and uid:
-        try:
-            brand["user_id"] = uid
-            res = client.table("brands").upsert(brand).execute()
-            return (res.data or [brand])[0]
-        except Exception as e:
-            print(f"[db] Supabase upsert_brand error: {e}")
-    # Fallback JSON
-    brands = load_brands()
-    brands = [b for b in brands if b.get("id") != brand.get("id")]
-    brands.append(brand)
-    save_brands(brands)
-    return brand
+        brand["user_id"] = uid
+        res = client.table("brands").upsert(brand).execute()
+        return (res.data or [brand])[0]
+    raise RuntimeError("Utilisateur non authentifié ou Supabase non configuré")
 
 
 def delete_brand(brand_id: str):

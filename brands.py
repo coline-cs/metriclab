@@ -48,25 +48,21 @@ def remove_section(name: str) -> list[str]:
     return _db.remove_section(name)
 
 
-def add_brand(name: str, url: str, label: str = "Top Performers", notes: str = "", niche: str = "🐾 Animaux") -> dict:
+def add_brand(name: str, url: str, label: str = "Top Performers", notes: str = "", niche: str = "🐾 Animaux", tags: list = None) -> dict:
+    all_tags = tags if tags is not None else ([label.strip()] if label.strip() else [])
     brand = {
         "id": f"{name.lower().replace(' ', '_')}_{int(datetime.now().timestamp())}",
         "name": name.strip(),
         "url": url.strip(),
-        "label": label.strip() or "Top Performers",
+        "label": label.strip() or (all_tags[0] if all_tags else ""),
         "notes": notes.strip(),
         "niche": niche,
-        "tags": [label.strip()] if label.strip() else [],
+        "tags": all_tags,
         "last_scraped": None,
         "ad_count": 0,
         "avg_score": None,
         "created_at": datetime.now().isoformat(),
     }
-    # dédoublonnage par URL
-    existing = load_brands()
-    existing = [b for b in existing if b.get("url") != url.strip()]
-    existing.append(brand)
-    save_brands(existing)
     _db.upsert_brand(brand)
     return brand
 
