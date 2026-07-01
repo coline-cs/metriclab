@@ -485,12 +485,12 @@ with st.sidebar:
             _email_short = user["email"][:22] + "…" if len(user["email"]) > 22 else user["email"]
             st.markdown(f"""
             <div style="display:flex;align-items:center;gap:10px;padding:8px 0 12px;">
-                <div style="width:34px;height:34px;border-radius:50%;background:#0a0a0a;color:#fff;
+                <div style="width:34px;height:34px;border-radius:50%;background:#fff;color:#0c0c0c;
                     display:flex;align-items:center;justify-content:center;font-weight:700;
                     font-size:13px;flex-shrink:0;">{_initiale}</div>
                 <div>
-                    <div style="font-size:12px;font-weight:600;color:#0a0a0a;line-height:1.2;">Mon espace</div>
-                    <div style="font-size:11px;color:#999;">{_email_short}</div>
+                    <div style="font-size:12px;font-weight:600;color:#e0e0e0;line-height:1.2;">Mon espace</div>
+                    <div style="font-size:11px;color:#555;">{_email_short}</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -617,30 +617,29 @@ if not _has_api_key or len(_brands_for_onboarding) == 0:
     _step3_done = len(transcriptions) > 0
     def _step_style(done):
         if done:
-            return "background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;text-align:center;"
-        return "background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:12px;text-align:center;"
+            return "background:#052e16;border:1px solid #064e3b;border-radius:10px;padding:12px;text-align:center;"
+        return "background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:12px;text-align:center;"
     def _num_style(done):
         if done:
             return "width:22px;height:22px;border-radius:50%;background:#059669;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-bottom:6px;"
-        return "width:22px;height:22px;border-radius:50%;background:#e5e7eb;color:#6b7280;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-bottom:6px;"
-    _check = "✓" if True else ""
+        return "width:22px;height:22px;border-radius:50%;background:#2a2a2a;color:#555;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-bottom:6px;"
     st.markdown(f"""
-    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px 20px;margin-bottom:16px;">
-        <div style="font-family:'League Spartan',sans-serif;font-weight:700;font-size:13px;color:#0a0a0a;margin-bottom:12px;">
+    <div style="background:#141414;border:1px solid #1e1e1e;border-radius:12px;padding:16px 20px;margin-bottom:16px;">
+        <div style="font-family:'League Spartan',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:12px;letter-spacing:-0.02em;">
             Démarrage rapide
         </div>
         <div style="display:flex;gap:10px;">
             <div style="{_step_style(_step1_done)}flex:1;">
                 <div style="{_num_style(_step1_done)}">{"✓" if _step1_done else "1"}</div>
-                <div style="font-size:11px;color:#374151;font-weight:500;line-height:1.4;">Ajouter ta clé<br>Anthropic API</div>
+                <div style="font-size:11px;color:{"#34d399" if _step1_done else "#888"};font-weight:500;line-height:1.4;">Ajouter ta clé<br>Anthropic API</div>
             </div>
             <div style="{_step_style(_step2_done)}flex:1;">
                 <div style="{_num_style(_step2_done)}">{"✓" if _step2_done else "2"}</div>
-                <div style="font-size:11px;color:#374151;font-weight:500;line-height:1.4;">Ajouter une<br>marque à surveiller</div>
+                <div style="font-size:11px;color:{"#34d399" if _step2_done else "#888"};font-weight:500;line-height:1.4;">Ajouter une<br>marque à surveiller</div>
             </div>
             <div style="{_step_style(_step3_done)}flex:1;">
                 <div style="{_num_style(_step3_done)}">{"✓" if _step3_done else "3"}</div>
-                <div style="font-size:11px;color:#374151;font-weight:500;line-height:1.4;">Scraper et<br>analyser les pubs</div>
+                <div style="font-size:11px;color:{"#34d399" if _step3_done else "#888"};font-weight:500;line-height:1.4;">Scraper et<br>analyser les pubs</div>
             </div>
         </div>
     </div>
@@ -866,7 +865,7 @@ if _nav == "🏢 Marques":
                     _last  = _brand.get("last_scraped") or "Jamais scrapée"
                     _ads_n = _brand.get("ad_count", 0)
                     _avg   = _brand.get("avg_score")
-                    _sc_html = f'<span style="color:{"#155724" if _avg>=7 else "#856404"};font-weight:700">⭐ {_avg}/10</span>' if _avg else '<span style="color:#adb5bd">Non scorée</span>'
+                    _sc_html = f'<span style="color:{"#34d399" if _avg>=7 else "#fbbf24"};font-weight:700">⭐ {_avg}/10</span>' if _avg else '<span style="color:#444">Non scorée</span>'
                     _bid = _brand["id"]
 
                     # Compat : si l'ancien champ label existe, le convertir en tags
@@ -906,7 +905,7 @@ if _nav == "🏢 Marques":
                     # ── Affichage normal ───────────────────────────────
                     _tags = _brand.get("tags", [_brand.get("label", "")])
                     _tags_html = " ".join(
-                        f'<span style="background:{"#fff3cd" if t in _PERF_LEVELS else "#e8f4fd"};border:1px solid {"#ffc107" if t in _PERF_LEVELS else "#90caf9"};border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600">{t}</span>'
+                        f'<span style="background:{"#1c1400" if t in _PERF_LEVELS else "#0d1f2d"};border:1px solid {"#2d2000" if t in _PERF_LEVELS else "#0c3052"};color:{"#fbbf24" if t in _PERF_LEVELS else "#60a5fa"};border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600">{t}</span>'
                         for t in _tags if t
                     )
                     _cinfo, _cbtn = st.columns([5, 2])

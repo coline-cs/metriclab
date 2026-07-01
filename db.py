@@ -36,6 +36,23 @@ def _get_client():
         return None
 
 
+def _get_authed_client():
+    """Client Supabase authentifié avec le JWT de l'utilisateur courant (requis pour RLS)."""
+    client = _get_client()
+    if not client:
+        return None
+    try:
+        import streamlit as st
+        session = st.session_state.get("_auth_session")
+        if session and hasattr(session, "access_token") and session.access_token:
+            client.postgrest.auth(session.access_token)
+        elif session and isinstance(session, dict) and session.get("access_token"):
+            client.postgrest.auth(session["access_token"])
+    except Exception:
+        pass
+    return client
+
+
 def _use_supabase() -> bool:
     return _get_client() is not None
 
@@ -53,7 +70,7 @@ def _uid() -> str | None:
 # ── Marques ──────────────────────────────────────────────────────────────────
 
 def load_brands() -> list[dict]:
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
@@ -70,7 +87,7 @@ def load_brands() -> list[dict]:
 
 
 def save_brands(brands: list[dict]):
-    client = _get_client()
+    client = _get_authed_client()
     if client:
         return  # géré par upsert_brand
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -78,7 +95,7 @@ def save_brands(brands: list[dict]):
 
 
 def upsert_brand(brand: dict) -> dict:
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
@@ -96,7 +113,7 @@ def upsert_brand(brand: dict) -> dict:
 
 
 def delete_brand(brand_id: str):
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
@@ -109,7 +126,7 @@ def delete_brand(brand_id: str):
 
 
 def update_brand_fields(brand_id: str, fields: dict):
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
@@ -127,7 +144,7 @@ def update_brand_fields(brand_id: str, fields: dict):
 # ── Sections ─────────────────────────────────────────────────────────────────
 
 def load_sections() -> list[str]:
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
@@ -145,7 +162,7 @@ def load_sections() -> list[str]:
 
 
 def save_sections(sections: list[str]):
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
@@ -177,7 +194,7 @@ def remove_section(name: str) -> list[str]:
 # ── Transcriptions ────────────────────────────────────────────────────────────
 
 def load_transcriptions() -> list[dict]:
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
@@ -194,7 +211,7 @@ def load_transcriptions() -> list[dict]:
 
 
 def save_transcriptions(entries: list[dict]):
-    client = _get_client()
+    client = _get_authed_client()
     if client:
         try:
             for entry in entries:
@@ -207,7 +224,7 @@ def save_transcriptions(entries: list[dict]):
 
 
 def _supa_upsert_transcription(entry: dict):
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if not client or not uid:
         return
@@ -235,7 +252,7 @@ def append_transcription(entry: dict):
 # ── Snapshots tracker ─────────────────────────────────────────────────────────
 
 def save_brand_snapshot(brand_name: str, ads: list[dict]):
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
@@ -251,7 +268,7 @@ def save_brand_snapshot(brand_name: str, ads: list[dict]):
 
 
 def load_brand_snapshots(brand_name: str) -> list[dict]:
-    client = _get_client()
+    client = _get_authed_client()
     uid = _uid()
     if client and uid:
         try:
