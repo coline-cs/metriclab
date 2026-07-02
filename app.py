@@ -13,6 +13,13 @@ from pathlib import Path
 
 import streamlit as st
 
+# Auth — doit être importé avant st.set_page_config
+try:
+    from auth import get_current_user, get_current_user_id, render_login_page, sign_out, try_restore_session
+    AUTH_AVAILABLE = True
+except ImportError:
+    AUTH_AVAILABLE = False
+
 BASE_DIR = Path(__file__).parent
 OUTPUT_DIR = BASE_DIR / "transcriptions"
 GENERATED_DIR = BASE_DIR / "generated_copy"
@@ -61,69 +68,89 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+# ── Auth gate ────────────────────────────────
+if AUTH_AVAILABLE:
+    if not get_current_user():
+        try_restore_session()  # tente de restaurer depuis localStorage
+    if not get_current_user():
+        render_login_page()
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;800;900&display=swap');
 
-/* ── Base ── */
-html, body, [data-testid="stAppViewContainer"] {
-    background: #f5f5f5 !important;
-    color: #0a0a0a !important;
+/* ── BASE DARK ── */
+html, body,
+[data-testid="stAppViewContainer"],
+[data-testid="stApp"],
+.stApp {
+    background: #0c0c0c !important;
+    color: #e0e0e0 !important;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif !important;
 }
-[data-testid="stHeader"] { background: transparent !important; box-shadow: none !important; }
-[data-testid="stMainBlockContainer"] { padding-top: 0 !important; }
+[data-testid="stHeader"] { background: #0c0c0c !important; box-shadow: none !important; }
+[data-testid="stMainBlockContainer"] { padding-top: 0 !important; background: #0c0c0c !important; }
+[data-testid="stBottom"] { background: #0c0c0c !important; }
+section[data-testid="stSidebar"] > div { background: #111 !important; }
 
 /* ── Labels ── */
 label, .stTextInput label, .stTextArea label,
 .stSelectbox label, .stSlider label,
 div[data-testid="stWidgetLabel"] p,
 div[data-testid="stWidgetLabel"] {
-    color: #0a0a0a !important;
-    font-weight: 600 !important;
-    font-size: .88rem !important;
+    color: #888 !important;
+    font-weight: 500 !important;
+    font-size: .82rem !important;
     letter-spacing: .01em !important;
 }
+p, li, span { color: #c0c0c0 !important; }
 
 /* ── Inputs ── */
 input, textarea, .stTextInput input, .stTextArea textarea {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #2a2a2a !important;
     border-radius: 10px !important;
     font-size: .9rem !important;
 }
 input:focus, textarea:focus {
-    border-color: #0a0a0a !important;
-    box-shadow: 0 0 0 3px rgba(10,10,10,.08) !important;
+    border-color: #fff !important;
+    box-shadow: none !important;
 }
-input::placeholder, textarea::placeholder { color: #b0b0b0 !important; }
+input::placeholder, textarea::placeholder { color: #444 !important; }
 
 /* ── Selectbox ── */
 .stSelectbox div[data-baseweb="select"] > div {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #2a2a2a !important;
     border-radius: 10px !important;
 }
+[data-baseweb="popover"], [data-baseweb="menu"] {
+    background: #1a1a1a !important;
+    border: 1px solid #2a2a2a !important;
+}
+[role="option"] { background: #1a1a1a !important; color: #e0e0e0 !important; }
+[role="option"]:hover { background: #252525 !important; }
 
 /* ── Navigation principale ── */
 div[data-testid="stSegmentedControl"],
 div[data-testid="stButtonGroup"] {
-    background: #ffffff !important;
-    border-radius: 14px !important;
-    padding: 5px 6px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04) !important;
+    background: #1a1a1a !important;
+    border-radius: 12px !important;
+    padding: 4px 5px !important;
+    border: 1px solid #222 !important;
+    box-shadow: none !important;
     gap: 2px !important;
     overflow-x: auto !important;
 }
 div[data-testid="stSegmentedControl"] button,
 div[data-testid="stButtonGroup"] button {
-    border-radius: 9px !important;
+    border-radius: 8px !important;
     font-weight: 500 !important;
     font-size: .81rem !important;
     border: none !important;
-    color: #666 !important;
+    color: #555 !important;
     background: transparent !important;
     transition: all 0.12s ease !important;
     white-space: nowrap !important;
@@ -131,232 +158,317 @@ div[data-testid="stButtonGroup"] button {
 }
 div[data-testid="stSegmentedControl"] button:hover,
 div[data-testid="stButtonGroup"] button:hover {
-    background: #f0f0f0 !important;
-    color: #0a0a0a !important;
+    background: #252525 !important;
+    color: #ccc !important;
 }
 div[data-testid="stSegmentedControl"] button[aria-checked="true"],
 div[data-testid="stButtonGroup"] button[aria-checked="true"],
 div[data-testid="stSegmentedControl"] button[kind="segmented_controlActive"],
 div[data-testid="stButtonGroup"] button[kind="segmented_controlActive"] {
-    background: #0a0a0a !important;
-    color: #ffffff !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,.20) !important;
+    background: #fff !important;
+    color: #0c0c0c !important;
+    box-shadow: none !important;
 }
 
 /* ── Onglets ── */
 .stTabs [data-baseweb="tab-list"] {
-    background: #ffffff !important;
+    background: #1a1a1a !important;
     border-radius: 10px !important;
-    padding: 4px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.07) !important;
-    gap: 3px !important;
+    padding: 3px !important;
+    box-shadow: none !important;
+    border: 1px solid #222 !important;
+    gap: 2px !important;
 }
 .stTabs [data-baseweb="tab"] {
     background: transparent !important;
-    color: #666 !important;
+    color: #555 !important;
     border-radius: 7px !important;
     font-weight: 500 !important;
     padding: 7px 14px !important;
 }
 .stTabs [aria-selected="true"] {
-    background: #0a0a0a !important;
-    color: #ffffff !important;
+    background: #fff !important;
+    color: #0c0c0c !important;
 }
 
-/* ── Boutons primaires ── */
+/* ── Boutons ── */
 .stButton > button {
-    border-radius: 10px !important;
+    border-radius: 9px !important;
     font-weight: 600 !important;
-    font-size: .88rem !important;
+    font-size: .85rem !important;
     border: none !important;
     transition: all 0.12s ease !important;
     cursor: pointer !important;
     letter-spacing: .01em !important;
 }
 .stButton > button[kind="primary"] {
-    background: #0a0a0a !important;
-    color: #ffffff !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.15) !important;
+    background: #ffffff !important;
+    color: #0c0c0c !important;
 }
 .stButton > button[kind="primary"]:hover {
-    background: #222 !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,.22) !important;
+    background: #e0e0e0 !important;
     transform: translateY(-1px) !important;
 }
-.stButton > button[kind="primary"]:active { transform: translateY(0) !important; }
 .stButton > button:not([kind="primary"]) {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #c0c0c0 !important;
+    border: 1px solid #2a2a2a !important;
 }
 .stButton > button:not([kind="primary"]):hover {
-    background: #f5f5f5 !important;
-    border-color: #0a0a0a !important;
+    background: #252525 !important;
+    border-color: #444 !important;
     transform: translateY(-1px) !important;
 }
-.stButton > button:disabled {
-    opacity: 0.35 !important;
-    cursor: not-allowed !important;
-    transform: none !important;
-    box-shadow: none !important;
-}
+.stButton > button:disabled { opacity: 0.25 !important; transform: none !important; }
 
 /* ── Download button ── */
 .stDownloadButton > button {
-    border-radius: 10px !important;
+    border-radius: 9px !important;
     font-weight: 600 !important;
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #c0c0c0 !important;
+    border: 1px solid #2a2a2a !important;
     transition: all 0.12s ease !important;
 }
 .stDownloadButton > button:hover {
-    background: #0a0a0a !important;
-    color: #fff !important;
-    border-color: #0a0a0a !important;
-    transform: translateY(-1px) !important;
+    background: #fff !important;
+    color: #0c0c0c !important;
+    border-color: #fff !important;
 }
 
 /* ── Expander ── */
 .streamlit-expanderHeader {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1px solid #e8e8e8 !important;
+    background: #1a1a1a !important;
+    color: #c0c0c0 !important;
+    border: 1px solid #2a2a2a !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
-    transition: background 0.12s ease !important;
 }
-.streamlit-expanderHeader:hover { background: #f9f9f9 !important; }
+.streamlit-expanderHeader:hover { background: #202020 !important; }
+.streamlit-expanderContent { background: #141414 !important; border: 1px solid #2a2a2a !important; }
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
-    background: #ffffff !important;
-    border-right: 1px solid #ebebeb !important;
+    background: #111 !important;
+    border-right: 1px solid #1e1e1e !important;
 }
+[data-testid="stSidebar"] * { color: #888 !important; }
+[data-testid="stSidebar"] h1,[data-testid="stSidebar"] h2,[data-testid="stSidebar"] h3 { color: #e0e0e0 !important; }
+
+/* ── Alerts / info boxes ── */
+[data-testid="stAlert"] { background: #1a1a1a !important; border: 1px solid #2a2a2a !important; color: #c0c0c0 !important; border-radius: 10px !important; }
+.stSuccess { background: #0d1f0d !important; border-color: #1a3a1a !important; }
+.stError { background: #1f0d0d !important; border-color: #3a1a1a !important; }
+.stWarning { background: #1f190d !important; border-color: #3a300a !important; }
 
 /* ── Header metric lab ── */
 .ml-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 18px 0 12px; margin-bottom: 4px;
-    border-bottom: 1px solid #ebebeb;
+    border-bottom: 1px solid #1e1e1e;
 }
 .ml-logo {
     font-family: 'League Spartan', 'Helvetica Neue', Arial, sans-serif;
-    font-weight: 900; font-size: 1.85rem; color: #0a0a0a;
-    letter-spacing: -0.03em; line-height: 1;
+    font-weight: 900; font-size: 1.85rem; color: #fff;
+    letter-spacing: -0.04em; line-height: 1;
+    display: flex; align-items: center; gap: 10px;
 }
-.ml-logo span { color: #0a0a0a; }
-.ml-tagline { font-size: .75rem; color: #999; font-weight: 500; margin-top: 2px; letter-spacing: .04em; text-transform: uppercase; }
+.ml-plan-badge {
+    font-size: 0.52rem; font-weight: 700; letter-spacing: .06em;
+    background: #fff; color: #0c0c0c;
+    padding: 3px 8px; border-radius: 20px;
+    text-transform: uppercase; vertical-align: middle;
+}
+.ml-tagline { font-size: .70rem; color: #444; font-weight: 500; margin-top: 3px; letter-spacing: .06em; text-transform: uppercase; }
+
+/* ── Titres ── */
+h1, h2, h3 {
+    font-family: 'League Spartan', 'Helvetica Neue', Arial, sans-serif !important;
+    letter-spacing: -0.02em !important;
+    color: #fff !important;
+}
 
 /* ── Stat cards ── */
 .stat-card {
-    background: #ffffff; border-radius: 14px; padding: 18px 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
-    text-align: center; transition: all 0.15s ease; cursor: default;
+    background: #1a1a1a; border-radius: 12px; padding: 16px 12px;
+    border: 1px solid #222;
+    text-align: center; transition: border-color 0.15s ease; cursor: default;
 }
-.stat-card:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,.09), 0 0 0 1px rgba(0,0,0,.06);
-    transform: translateY(-2px);
-}
-.stat-card .n { font-size: 2rem; font-weight: 800; color: #0a0a0a; line-height: 1; }
-.stat-card .l { font-size: .72rem; color: #999; margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+.stat-card:hover { border-color: #333; }
+.stat-card .n { font-size: 1.9rem; font-weight: 800; color: #fff; line-height: 1; }
+.stat-card .l { font-size: .68rem; color: #444; margin-top: 5px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
 
 /* ── Brand row ── */
 .brand-row {
-    background: #ffffff; border-radius: 12px; border-left: 3px solid #0a0a0a;
-    padding: 14px 18px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.03);
+    background: #141414; border-radius: 10px; border-left: 2px solid #fff;
+    padding: 14px 18px; border-top: 1px solid #1e1e1e;
+    border-right: 1px solid #1e1e1e; border-bottom: 1px solid #1e1e1e;
+    margin-bottom: 6px;
 }
-.brand-row-name { font-size: .95rem; font-weight: 700; color: #0a0a0a; margin-bottom: 5px; }
-.brand-row-meta { display: flex; gap: 12px; font-size: .76rem; color: #888; flex-wrap: wrap; }
+.brand-row-name { font-size: .95rem; font-weight: 700; color: #fff; margin-bottom: 5px; }
+.brand-row-meta { display: flex; gap: 12px; font-size: .74rem; color: #444; flex-wrap: wrap; }
 .brand-row-meta span { display: inline-flex; align-items: center; gap: 3px; }
 
 /* ── Workflow steps ── */
 .wf-bar {
     display: flex; align-items: center; gap: 0;
-    background: #ffffff; border-radius: 14px;
+    background: #141414; border-radius: 12px;
     padding: 12px 20px; margin-bottom: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.04);
+    border: 1px solid #1e1e1e;
 }
 .wf-step {
     flex: 1; text-align: center; padding: 8px 6px;
     border-radius: 8px; font-size: .8rem; font-weight: 500;
-    color: #bbb; background: transparent; transition: .15s;
+    color: #333; background: transparent; transition: .15s;
 }
 .wf-step .wf-n {
     display: inline-flex; align-items: center; justify-content: center;
     width: 22px; height: 22px; border-radius: 50%; font-size: .7rem;
     font-weight: 700; margin-right: 6px;
-    background: #ebebeb; color: #999;
+    background: #222; color: #555;
 }
-.wf-step.wf-done { color: #2d7a47; }
-.wf-step.wf-done .wf-n { background: #d4edda; color: #155724; }
-.wf-step.wf-active { color: #0a0a0a; font-weight: 700; }
-.wf-step.wf-active .wf-n { background: #0a0a0a; color: #fff; }
-.wf-arrow { color: #d8d8d8; font-size: 1.1rem; padding: 0 4px; }
+.wf-step.wf-done { color: #34d399; }
+.wf-step.wf-done .wf-n { background: #052e16; color: #34d399; }
+.wf-step.wf-active { color: #fff; font-weight: 700; }
+.wf-step.wf-active .wf-n { background: #fff; color: #0c0c0c; }
+.wf-arrow { color: #2a2a2a; font-size: 1.1rem; padding: 0 4px; }
 
 /* ── Context pills ── */
 .context-pill {
     display: inline-flex; align-items: center; gap: 5px;
-    background: #f0f0f0; color: #0a0a0a; border-radius: 20px;
+    background: #1a1a1a; color: #c0c0c0; border-radius: 20px;
     padding: 4px 12px; font-size: .74rem; font-weight: 600; margin: 3px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #2a2a2a;
 }
-.context-pill.green { background: #f0fff4; color: #2d7a47; border-color: #b2e8c5; }
-.context-pill.orange { background: #fff8e6; color: #7a5a00; border-color: #ffd88a; }
-.context-pill.grey { background: #f5f5f5; color: #888; border-color: #e0e0e0; }
+.context-pill.green { background: #052e16; color: #34d399; border-color: #064e3b; }
+.context-pill.orange { background: #1c1400; color: #fbbf24; border-color: #2d2000; }
+.context-pill.grey { background: #1a1a1a; color: #555; border-color: #222; }
 
 /* ── Suggestion pills ── */
 .suggestion-pill {
     display: inline-block; padding: 7px 15px; margin: 3px;
-    background: #fff; border: 1.5px solid #e0e0e0;
-    border-radius: 20px; font-size: .81rem; color: #333;
+    background: #1a1a1a; border: 1px solid #2a2a2a;
+    border-radius: 20px; font-size: .81rem; color: #888;
     cursor: pointer; transition: all 0.12s ease; user-select: none;
 }
 .suggestion-pill:hover {
-    border-color: #0a0a0a; color: #0a0a0a;
-    background: #f5f5f5; transform: translateY(-1px);
+    border-color: #fff; color: #fff;
+    background: #222; transform: translateY(-1px);
 }
 
 /* ── Chat ── */
 [data-testid="stChatMessage"] {
-    background: #ffffff !important;
+    background: #141414 !important;
     border-radius: 12px !important;
-    border: 1px solid #ebebeb !important;
+    border: 1px solid #1e1e1e !important;
     margin-bottom: 8px !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,.04) !important;
 }
 [data-testid="stChatInput"] textarea {
-    background: #ffffff !important;
-    color: #0a0a0a !important;
-    border: 1.5px solid #e0e0e0 !important;
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #2a2a2a !important;
     border-radius: 10px !important;
 }
-[data-testid="stChatInput"] textarea:focus {
-    border-color: #0a0a0a !important;
-    box-shadow: 0 0 0 3px rgba(10,10,10,.08) !important;
-}
+[data-testid="stChatInput"] textarea:focus { border-color: #fff !important; }
 
 /* ── Empty state ── */
 .empty-state-box {
-    text-align: center; padding: 52px 24px; background: #ffffff;
-    border-radius: 14px; border: 2px dashed #e0e0e0; color: #888; margin-top: 8px;
+    text-align: center; padding: 52px 24px; background: #141414;
+    border-radius: 14px; border: 1px dashed #2a2a2a; color: #444; margin-top: 8px;
 }
-.ebox-icon { font-size: 2.4rem; margin-bottom: 12px; }
-.ebox-title { font-size: 1rem; font-weight: 700; color: #0a0a0a; margin-bottom: 6px; }
-.ebox-sub { font-size: .84rem; }
+.ebox-icon { font-size: 2rem; margin-bottom: 12px; color: #333; }
+.ebox-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.ebox-sub { font-size: .84rem; color: #444; }
 
 /* ── Slider ── */
 .stSlider div[data-testid="stTickBarMin"],
 .stSlider div[data-testid="stTickBarMax"] { color: #999 !important; }
-h3 { color: #0a0a0a !important; font-weight: 700 !important; }
+
+/* ── Stats grid — CSS natif, responsive sans Streamlit columns ── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+    /* Header ultra compact */
+    .ml-logo { font-size: 1.2rem !important; }
+    .ml-tagline { display: none !important; }
+    .ml-header { padding: 8px 0 6px !important; border-bottom: none !important; }
+    .ml-plan-badge { font-size: 0.48rem !important; padding: 2px 6px !important; }
+
+    /* Stats : 3 par ligne, ultra compact */
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+        margin-bottom: 8px !important;
+    }
+    .stat-card {
+        padding: 10px 4px !important;
+        border-radius: 10px !important;
+    }
+    .stat-card .n { font-size: 1.3rem !important; }
+    .stat-card .l {
+        font-size: .56rem !important;
+        margin-top: 3px !important;
+        letter-spacing: .02em !important;
+    }
+    .stat-card:hover { transform: none !important; }
+
+    /* Navigation : scroll horizontal invisible */
+    div[data-testid="stSegmentedControl"],
+    div[data-testid="stButtonGroup"] {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        padding: 3px !important;
+    }
+    div[data-testid="stSegmentedControl"]::-webkit-scrollbar,
+    div[data-testid="stButtonGroup"]::-webkit-scrollbar { display: none !important; }
+    div[data-testid="stSegmentedControl"] button,
+    div[data-testid="stButtonGroup"] button {
+        font-size: .72rem !important;
+        padding: 4px 9px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Colonnes formulaires → stack */
+    [data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+    }
+    [data-testid="stHorizontalBlock"] > [data-testid="column"] {
+        min-width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    /* Onboarding compact */
+    .ob-steps { gap: 5px !important; }
+
+    /* Padding latéral */
+    [data-testid="stMainBlockContainer"] {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+        padding-top: 4px !important;
+    }
+
+    /* Brand rows */
+    .brand-row { padding: 10px 12px !important; }
+    .brand-row-name { font-size: .88rem !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
+_header_user = get_current_user() if AUTH_AVAILABLE else None
+_header_plan = "Admin" if (_header_user and _header_user.get("email") == "chantelouxc@gmail.com") else ("Pro" if _header_user else "")
+_badge_html = f'<span class="ml-plan-badge">{_header_plan}</span>' if _header_plan else ""
+st.markdown(f"""
 <div class="ml-header">
   <div>
-    <div class="ml-logo">metric lab</div>
+    <div class="ml-logo">metric lab {_badge_html}</div>
     <div class="ml-tagline">Intelligence · Analyse · Prédiction</div>
   </div>
 </div>
@@ -366,24 +478,53 @@ st.markdown("""
 # SIDEBAR — clé API + options
 # ──────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### ⚙️ Configuration")
+    if AUTH_AVAILABLE:
+        user = get_current_user()
+        if user:
+            _initiale = user["email"][0].upper()
+            _email_short = user["email"][:22] + "…" if len(user["email"]) > 22 else user["email"]
+            st.markdown(f"""
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0 12px;">
+                <div style="width:34px;height:34px;border-radius:50%;background:#fff;color:#0c0c0c;
+                    display:flex;align-items:center;justify-content:center;font-weight:700;
+                    font-size:13px;flex-shrink:0;">{_initiale}</div>
+                <div>
+                    <div style="font-size:12px;font-weight:600;color:#e0e0e0;line-height:1.2;">Mon espace</div>
+                    <div style="font-size:11px;color:#555;">{_email_short}</div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("Se déconnecter", use_container_width=True):
+                sign_out()
+                st.rerun()
+            st.divider()
+
+    st.markdown("### Configuration")
+    _admin_email = "chantelouxc@gmail.com"
+    _current_user = get_current_user() if AUTH_AVAILABLE else None
+    _is_admin = _current_user and _current_user.get("email") == _admin_email
+    _api_default = os.environ.get("ANTHROPIC_API_KEY", "") if _is_admin else st.session_state.get("_user_api_key", "")
     api_key_input = st.text_input(
         "Clé Anthropic API",
         type="password",
-        value=os.environ.get("ANTHROPIC_API_KEY", ""),
+        value=_api_default,
         help="Obtiens ta clé sur console.anthropic.com",
     )
     if api_key_input:
         # Nettoyage agressif : espaces, retours ligne, guillemets, caractères invisibles
         _clean_key = "".join(api_key_input.split()).strip('"').strip("'").strip()
-        os.environ["ANTHROPIC_API_KEY"] = _clean_key
+        st.session_state["_user_api_key"] = _clean_key
+        if _is_admin:
+            os.environ["ANTHROPIC_API_KEY"] = _clean_key
+        else:
+            os.environ["ANTHROPIC_API_KEY"] = _clean_key  # actif pour cette session uniquement
 
         if _clean_key.startswith("sk-ant-admin"):
-            st.error("❌ C'est une clé ADMIN — elle ne peut pas appeler les modèles. Crée une clé API standard sur console.anthropic.com → API Keys.")
+            st.error("Clé ADMIN — elle ne peut pas appeler les modèles. Crée une clé standard sur console.anthropic.com → API Keys.")
         elif not _clean_key.startswith("sk-ant-"):
-            st.warning("⚠️ Format inattendu — une clé Anthropic commence par `sk-ant-api...`")
+            st.warning("Format inattendu — une clé Anthropic commence par `sk-ant-api…`")
         else:
-            st.success(f"Clé enregistrée ✓ (…{_clean_key[-4:]})")
+            st.markdown(f'<div style="font-size:11px;color:#059669;padding:4px 0;">Clé active ···{_clean_key[-4:]}</div>', unsafe_allow_html=True)
 
         if st.button("🔌 Tester la clé", key="test_api_key", use_container_width=True):
             try:
@@ -446,23 +587,63 @@ gen_files  = list(GENERATED_DIR.glob("*.txt"))
 scored_entries = [r for r in transcriptions if r.get("scoring") and isinstance(r.get("scoring"), dict) and r["scoring"].get("score_total") is not None]
 avg_score = round(sum(r["scoring"]["score_total"] for r in scored_entries) / len(scored_entries), 1) if scored_entries else None
 
-col1, col2, col3, col4, col5, col6 = st.columns(6)
-with col1:
-    st.markdown(f'<div class="stat-card"><div class="n">{len(transcriptions)}</div><div class="l">Transcriptions</div></div>', unsafe_allow_html=True)
-with col2:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#f0ad4e">{tops_count}</div><div class="l">🏆 Top Performers</div></div>', unsafe_allow_html=True)
-with col3:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#17a2b8">{new_count}</div><div class="l">🆕 Nouvelles Créas</div></div>', unsafe_allow_html=True)
-with col4:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#7c3aed">{vision_count}</div><div class="l">📷 Analysés visuel</div></div>', unsafe_allow_html=True)
-with col5:
-    score_color = "#28a745" if avg_score and avg_score >= 7 else "#f0ad4e" if avg_score else "#adb5bd"
-    score_val = str(avg_score) if avg_score else "—"
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:{score_color}">{score_val}</div><div class="l">⭐ Score moyen</div></div>', unsafe_allow_html=True)
-with col6:
-    st.markdown(f'<div class="stat-card"><div class="n" style="color:#28a745">{len(gen_files)}</div><div class="l">✍️ Scripts générés</div></div>', unsafe_allow_html=True)
+score_color = "#059669" if avg_score and avg_score >= 7 else "#d97706" if avg_score else "#d1d5db"
+score_val = str(avg_score) if avg_score else "—"
+st.markdown(f"""
+<div class="stats-grid">
+  <div class="stat-card"><div class="n">{len(transcriptions)}</div><div class="l">Transcriptions</div></div>
+  <div class="stat-card"><div class="n" style="color:#d97706">{tops_count}</div><div class="l">Top performers</div></div>
+  <div class="stat-card"><div class="n" style="color:#0891b2">{new_count}</div><div class="l">Nouvelles créas</div></div>
+  <div class="stat-card"><div class="n" style="color:#7c3aed">{vision_count}</div><div class="l">Analysés visuel</div></div>
+  <div class="stat-card"><div class="n" style="color:{score_color}">{score_val}</div><div class="l">Score moyen</div></div>
+  <div class="stat-card"><div class="n" style="color:#059669">{len(gen_files)}</div><div class="l">Scripts générés</div></div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
+
+# ── Onboarding — affiché uniquement si compte vide sans clé API ──
+_has_api_key = bool(os.environ.get("ANTHROPIC_API_KEY", "").strip())
+_brands_for_onboarding = []
+if BRANDS_AVAILABLE:
+    try:
+        from brands import load_brands as _lb
+        _brands_for_onboarding = _lb()
+    except Exception:
+        pass
+if not _has_api_key or len(_brands_for_onboarding) == 0:
+    _step1_done = _has_api_key
+    _step2_done = len(_brands_for_onboarding) > 0
+    _step3_done = len(transcriptions) > 0
+    def _step_style(done):
+        if done:
+            return "background:#052e16;border:1px solid #064e3b;border-radius:10px;padding:12px;text-align:center;"
+        return "background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:12px;text-align:center;"
+    def _num_style(done):
+        if done:
+            return "width:22px;height:22px;border-radius:50%;background:#059669;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-bottom:6px;"
+        return "width:22px;height:22px;border-radius:50%;background:#2a2a2a;color:#555;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-bottom:6px;"
+    st.markdown(f"""
+    <div style="background:#141414;border:1px solid #1e1e1e;border-radius:12px;padding:16px 20px;margin-bottom:16px;">
+        <div style="font-family:'League Spartan',sans-serif;font-weight:700;font-size:13px;color:#fff;margin-bottom:12px;letter-spacing:-0.02em;">
+            Démarrage rapide
+        </div>
+        <div style="display:flex;gap:10px;">
+            <div style="{_step_style(_step1_done)}flex:1;">
+                <div style="{_num_style(_step1_done)}">{"✓" if _step1_done else "1"}</div>
+                <div style="font-size:11px;color:{"#34d399" if _step1_done else "#888"};font-weight:500;line-height:1.4;">Ajouter ta clé<br>Anthropic API</div>
+            </div>
+            <div style="{_step_style(_step2_done)}flex:1;">
+                <div style="{_num_style(_step2_done)}">{"✓" if _step2_done else "2"}</div>
+                <div style="font-size:11px;color:{"#34d399" if _step2_done else "#888"};font-weight:500;line-height:1.4;">Ajouter une<br>marque à surveiller</div>
+            </div>
+            <div style="{_step_style(_step3_done)}flex:1;">
+                <div style="{_num_style(_step3_done)}">{"✓" if _step3_done else "3"}</div>
+                <div style="font-size:11px;color:{"#34d399" if _step3_done else "#888"};font-weight:500;line-height:1.4;">Scraper et<br>analyser les pubs</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ──────────────────────────────────────────────
 # NAVIGATION — pilotable par programme (workflow, fin de scraping...)
@@ -634,7 +815,7 @@ if _nav == "🏢 Marques":
             with st.expander("Ajouter une marque", expanded=_open_form or len(brands_list) == 0):
                 _PERF_LEVELS_FORM = ["⭐ Top Performers", "🆕 Nouvelles Créas", "🧪 En test", "💡 Inspiration"]
                 _fa, _fb = st.columns([2, 5])
-                _new_name  = _fa.text_input("Nom", placeholder="ex: Bonjour", key="bn")
+                _new_name  = _fa.text_input("Nom", placeholder="ex: Nike, Sephora…", key="bn")
                 _new_url   = _fb.text_input("URL Meta Ads Library", placeholder="https://www.facebook.com/ads/library/?...", key="bu")
                 _sections_opts = load_sections()
                 _fc, _fd = st.columns([1, 1])
@@ -644,15 +825,12 @@ if _nav == "🏢 Marques":
                              disabled=not (_new_name.strip() and _new_url.strip())):
                     _add_tags = _add_perf + _add_niches
                     _add_label = _add_perf[0] if _add_perf else (_add_niches[0] if _add_niches else "")
-                    add_brand(_new_name, _new_url, _add_label)
-                    # Sauvegarder les tags
-                    _all_b = load_brands()
-                    for _b in _all_b:
-                        if _b["name"] == _new_name.strip():
-                            _b["tags"] = _add_tags
-                    save_brands(_all_b)
-                    st.success(f"✅ **{_new_name}** ajoutée !")
-                    st.rerun()
+                    try:
+                        add_brand(_new_name, _new_url, _add_label, tags=_add_tags)
+                        st.success(f"✅ **{_new_name}** ajoutée !")
+                        st.rerun()
+                    except Exception as _e_add:
+                        st.error(f"Erreur sauvegarde : {_e_add}")
 
             st.markdown("<br>", unsafe_allow_html=True)
 
@@ -684,7 +862,7 @@ if _nav == "🏢 Marques":
                     _last  = _brand.get("last_scraped") or "Jamais scrapée"
                     _ads_n = _brand.get("ad_count", 0)
                     _avg   = _brand.get("avg_score")
-                    _sc_html = f'<span style="color:{"#155724" if _avg>=7 else "#856404"};font-weight:700">⭐ {_avg}/10</span>' if _avg else '<span style="color:#adb5bd">Non scorée</span>'
+                    _sc_html = f'<span style="color:{"#34d399" if _avg>=7 else "#fbbf24"};font-weight:700">⭐ {_avg}/10</span>' if _avg else '<span style="color:#444">Non scorée</span>'
                     _bid = _brand["id"]
 
                     # Compat : si l'ancien champ label existe, le convertir en tags
@@ -724,7 +902,7 @@ if _nav == "🏢 Marques":
                     # ── Affichage normal ───────────────────────────────
                     _tags = _brand.get("tags", [_brand.get("label", "")])
                     _tags_html = " ".join(
-                        f'<span style="background:{"#fff3cd" if t in _PERF_LEVELS else "#e8f4fd"};border:1px solid {"#ffc107" if t in _PERF_LEVELS else "#90caf9"};border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600">{t}</span>'
+                        f'<span style="background:{"#1c1400" if t in _PERF_LEVELS else "#0d1f2d"};border:1px solid {"#2d2000" if t in _PERF_LEVELS else "#0c3052"};color:{"#fbbf24" if t in _PERF_LEVELS else "#60a5fa"};border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600">{t}</span>'
                         for t in _tags if t
                     )
                     _cinfo, _cbtn = st.columns([5, 2])

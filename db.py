@@ -3,6 +3,8 @@
 Couche d'accès aux données — Supabase avec fallback JSON local.
 Si SUPABASE_URL et SUPABASE_KEY sont définis : utilise Supabase.
 Sinon : lit/écrit dans transcriptions/*.json (comportement actuel).
+
+Toutes les opérations Supabase sont filtrées par user_id.
 """
 import json
 import os
@@ -34,17 +36,60 @@ def _get_client():
         return None
 
 
+def _get_authed_client():
+    """Client Supabase authentifié avec le JWT de l'utilisateur courant (requis pour RLS)."""
+    client = _get_client()
+    if not client:
+        return None
+    try:
+        import streamlit as st
+        session = st.session_state.get("_auth_session")
+        at, rt = None, None
+        if session:
+            if hasattr(session, "access_token"):
+                at = session.access_token
+                rt = getattr(session, "refresh_token", "") or ""
+            elif isinstance(session, dict):
+                at = session.get("access_token", "")
+                rt = session.get("refresh_token", "") or ""
+        if at:
+            # Méthode officielle supabase-py v2 : set_session propage l'auth à PostgREST
+            try:
+                client.auth.set_session(at, rt)
+            except Exception:
+                pass
+            # Fallback : setter direct sur le client postgrest
+            try:
+                client.postgrest.auth(at)
+            except Exception:
+                pass
+    except Exception:
+        pass
+    return client
+
+
 def _use_supabase() -> bool:
     return _get_client() is not None
+
+
+def _uid() -> str | None:
+    """Retourne le user_id depuis session_state Streamlit, ou None."""
+    try:
+        import streamlit as st
+        user = st.session_state.get("_auth_user")
+        return user["id"] if user else None
+    except Exception:
+        return None
 
 
 # ── Marques ──────────────────────────────────────────────────────────────────
 
 def load_brands() -> list[dict]:
-    client = _get_client()
-    if client:
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
         try:
-            res = client.table("brands").select("*").order("created_at").execute()
+            res = client.table("brands").select("*").eq("user_id", uid).order("created_at").execute()
             return res.data or []
         except Exception as e:
             print(f"[db] Supabase brands fallback JSON: {e}")
@@ -57,8 +102,7 @@ def load_brands() -> list[dict]:
 
 
 def save_brands(brands: list[dict]):
-    """Fallback JSON uniquement — en mode Supabase on upsert par id."""
-    client = _get_client()
+    client = _get_authed_client()
     if client:
         return  # géré par upsert_brand
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -66,26 +110,21 @@ def save_brands(brands: list[dict]):
 
 
 def upsert_brand(brand: dict) -> dict:
-    client = _get_client()
-    if client:
-        try:
-            res = client.table("brands").upsert(brand).execute()
-            return (res.data or [brand])[0]
-        except Exception as e:
-            print(f"[db] Supabase upsert_brand error: {e}")
-    # Fallback JSON
-    brands = load_brands()
-    brands = [b for b in brands if b.get("id") != brand.get("id")]
-    brands.append(brand)
-    save_brands(brands)
-    return brand
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
+        brand["user_id"] = uid
+        res = client.table("brands").upsert(brand).execute()
+        return (res.data or [brand])[0]
+    raise RuntimeError("Utilisateur non authentifié ou Supabase non configuré")
 
 
 def delete_brand(brand_id: str):
-    client = _get_client()
-    if client:
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
         try:
-            client.table("brands").delete().eq("id", brand_id).execute()
+            client.table("brands").delete().eq("id", brand_id).eq("user_id", uid).execute()
             return
         except Exception as e:
             print(f"[db] Supabase delete_brand error: {e}")
@@ -94,10 +133,11 @@ def delete_brand(brand_id: str):
 
 
 def update_brand_fields(brand_id: str, fields: dict):
-    client = _get_client()
-    if client:
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
         try:
-            client.table("brands").update(fields).eq("id", brand_id).execute()
+            client.table("brands").update(fields).eq("id", brand_id).eq("user_id", uid).execute()
             return
         except Exception as e:
             print(f"[db] Supabase update_brand error: {e}")
@@ -111,10 +151,11 @@ def update_brand_fields(brand_id: str, fields: dict):
 # ── Sections ─────────────────────────────────────────────────────────────────
 
 def load_sections() -> list[str]:
-    client = _get_client()
-    if client:
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
         try:
-            res = client.table("sections").select("name").order("created_at").execute()
+            res = client.table("sections").select("name").eq("user_id", uid).order("created_at").execute()
             names = [r["name"] for r in (res.data or [])]
             return names if names else ["Top Performers", "Nouvelles Créas"]
         except Exception as e:
@@ -128,12 +169,14 @@ def load_sections() -> list[str]:
 
 
 def save_sections(sections: list[str]):
-    client = _get_client()
-    if client:
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
         try:
-            client.table("sections").delete().neq("name", "__never__").execute()
-            rows = [{"name": s, "created_at": datetime.now().isoformat()} for s in sections]
-            client.table("sections").insert(rows).execute()
+            client.table("sections").delete().eq("user_id", uid).execute()
+            rows = [{"name": s, "user_id": uid, "created_at": datetime.now().isoformat()} for s in sections]
+            if rows:
+                client.table("sections").insert(rows).execute()
             return
         except Exception as e:
             print(f"[db] Supabase save_sections error: {e}")
@@ -158,10 +201,11 @@ def remove_section(name: str) -> list[str]:
 # ── Transcriptions ────────────────────────────────────────────────────────────
 
 def load_transcriptions() -> list[dict]:
-    client = _get_client()
-    if client:
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
         try:
-            res = client.table("transcriptions").select("*").order("scraped_at", desc=True).execute()
+            res = client.table("transcriptions").select("*").eq("user_id", uid).order("scraped_at", desc=True).execute()
             return res.data or []
         except Exception as e:
             print(f"[db] Supabase transcriptions fallback JSON: {e}")
@@ -174,7 +218,7 @@ def load_transcriptions() -> list[dict]:
 
 
 def save_transcriptions(entries: list[dict]):
-    client = _get_client()
+    client = _get_authed_client()
     if client:
         try:
             for entry in entries:
@@ -187,14 +231,14 @@ def save_transcriptions(entries: list[dict]):
 
 
 def _supa_upsert_transcription(entry: dict):
-    """Upserte une transcription dans Supabase. JSON fields auto-sérialisés."""
-    client = _get_client()
-    if not client:
+    client = _get_authed_client()
+    uid = _uid()
+    if not client or not uid:
         return
     row = {k: (json.dumps(v) if isinstance(v, (dict, list)) else v) for k, v in entry.items()}
-    # Clé d'upsert : ad_id si dispo, sinon position+label
+    row["user_id"] = uid
     if entry.get("ad_id"):
-        client.table("transcriptions").upsert(row, on_conflict="ad_id").execute()
+        client.table("transcriptions").upsert(row, on_conflict="ad_id,user_id").execute()
     else:
         client.table("transcriptions").insert(row).execute()
 
@@ -215,25 +259,27 @@ def append_transcription(entry: dict):
 # ── Snapshots tracker ─────────────────────────────────────────────────────────
 
 def save_brand_snapshot(brand_name: str, ads: list[dict]):
-    client = _get_client()
-    if client:
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
         try:
             client.table("brand_history").insert({
                 "brand_name": brand_name,
+                "user_id": uid,
                 "scraped_at": datetime.now().isoformat(),
                 "ads": json.dumps(ads),
             }).execute()
             return
         except Exception as e:
             print(f"[db] Supabase save_brand_snapshot error: {e}")
-    # Fallback : fichiers JSON locaux (tracker.py gère ça lui-même)
 
 
 def load_brand_snapshots(brand_name: str) -> list[dict]:
-    client = _get_client()
-    if client:
+    client = _get_authed_client()
+    uid = _uid()
+    if client and uid:
         try:
-            res = client.table("brand_history").select("*").eq("brand_name", brand_name).order("scraped_at").execute()
+            res = client.table("brand_history").select("*").eq("brand_name", brand_name).eq("user_id", uid).order("scraped_at").execute()
             snapshots = []
             for row in (res.data or []):
                 ads = row.get("ads")
@@ -243,4 +289,4 @@ def load_brand_snapshots(brand_name: str) -> list[dict]:
             return snapshots
         except Exception as e:
             print(f"[db] Supabase load_brand_snapshots fallback: {e}")
-    return []  # tracker.py utilise ses propres fichiers en fallback
+    return []
