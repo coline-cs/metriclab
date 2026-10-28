@@ -68,6 +68,11 @@ def _get_authed_client():
     return client
 
 
+def _local_dev() -> bool:
+    """Mode dev local uniquement (METRICLAB_LOCAL_DEV=1) : jamais sur le site publié."""
+    return os.environ.get("METRICLAB_LOCAL_DEV") == "1"
+
+
 def _use_supabase() -> bool:
     return _get_client() is not None
 
@@ -93,6 +98,15 @@ def load_brands() -> list[dict]:
             return res.data or []
         except Exception as e:
             print(f"[db] Supabase brands fallback JSON: {e}")
+    # Fallback service_role sans auth (mode local dev)
+    svc = _get_client() if _local_dev() else None
+    if svc:
+        try:
+            res = svc.table("brands").select("*").order("created_at").execute()
+            if res.data:
+                return res.data
+        except Exception as e:
+            print(f"[db] Supabase service brands error: {e}")
     if BRANDS_FILE.exists():
         try:
             return json.loads(BRANDS_FILE.read_text(encoding="utf-8"))
@@ -116,7 +130,18 @@ def upsert_brand(brand: dict) -> dict:
         brand["user_id"] = uid
         res = client.table("brands").upsert(brand).execute()
         return (res.data or [brand])[0]
-    raise RuntimeError("Utilisateur non authentifié ou Supabase non configuré")
+    if not _local_dev():
+        raise RuntimeError("Utilisateur non authentifié ou Supabase non configuré")
+    # Fallback JSON local (mode dev, pas de session Supabase)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    brands = load_brands()
+    existing = next((i for i, b in enumerate(brands) if b.get("id") == brand.get("id")), None)
+    if existing is not None:
+        brands[existing] = brand
+    else:
+        brands.append(brand)
+    BRANDS_FILE.write_text(json.dumps(brands, ensure_ascii=False, indent=2), encoding="utf-8")
+    return brand
 
 
 def delete_brand(brand_id: str):
@@ -209,6 +234,15 @@ def load_transcriptions() -> list[dict]:
             return res.data or []
         except Exception as e:
             print(f"[db] Supabase transcriptions fallback JSON: {e}")
+    # Fallback service_role sans auth (mode local dev)
+    svc = _get_client() if _local_dev() else None
+    if svc:
+        try:
+            res = svc.table("transcriptions").select("*").order("scraped_at", desc=True).execute()
+            if res.data:
+                return res.data
+        except Exception as e:
+            print(f"[db] Supabase service transcriptions error: {e}")
     if TRANS_FILE.exists():
         try:
             return json.loads(TRANS_FILE.read_text(encoding="utf-8"))

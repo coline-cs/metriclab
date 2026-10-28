@@ -96,7 +96,7 @@ async def scrape_video_urls(ads_library_url: str, label: str) -> list[dict]:
 
         async def on_response(response):
             url = response.url
-            if "ads/library/async" in url or ("graphql" in url and "AdsQuery" in url):
+            if "ads/library/async" in url or "/api/graphql/" in url:
                 try:
                     text = await response.text()
                     clean = text.lstrip("for (;;);").strip()
@@ -184,13 +184,23 @@ def _parse_api_response(obj, result_map: dict, depth=0, ad_id_map: dict = None):
     if isinstance(obj, dict):
         ad_id = str(obj.get("adid") or obj.get("ad_archive_id") or "")
         page_name = obj.get("page_name") or obj.get("advertiser_name")
+        if not page_name:
+            page_name = (obj.get("snapshot") or {}).get("page_name")
         bodies = obj.get("ad_creative_bodies") or []
         body = bodies[0] if bodies else None
-        # Transparence UE (DSA) : couverture réelle de la pub
-        eu_reach = obj.get("eu_total_reach")
+        # Couverture (reach_estimate = nouveau schéma GraphQL Meta, souvent null hors ads réglementées)
+        eu_reach = obj.get("reach_estimate")
+        if eu_reach is None:
+            eu_reach = obj.get("eu_total_reach")
         if eu_reach is None:
             eu_reach = (obj.get("aaa_info") or {}).get("eu_total_reach")
-        start_date = obj.get("start_date") or obj.get("ad_delivery_start_time")
+        start_date_raw = obj.get("start_date") or obj.get("ad_delivery_start_time")
+        start_date = start_date_raw
+        if isinstance(start_date_raw, (int, float)) and start_date_raw > 0:
+            try:
+                start_date = datetime.fromtimestamp(start_date_raw).strftime("%Y-%m-%d")
+            except Exception:
+                start_date = start_date_raw
         videos = []
         snap = obj.get("snapshot") or {}
         for v in snap.get("videos") or []:
@@ -800,19 +810,30 @@ applyFilters();
 # 5. PROGRAMME PRINCIPAL
 # ──────────────────────────────────────────────────────────────
 
-async def main(url_label_pairs: list[tuple[str, str]]):
+async def main(url_label_pairs: list[tuple[str, str]], page_names_override: list = None):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     print("\n╔══════════════════════════════════════════════╗")
     print("║   Meta Ads Library — Transcription vidéo    ║")
     print("╚══════════════════════════════════════════════╝")
 
+    page_names_override = page_names_override or []
+    max_per_brand = int(os.environ.get("MAX_VIDEOS_PER_BRAND", "5"))
     all_video_items: list[dict] = []
-    for url, label in url_label_pairs:
+    for i, (url, label) in enumerate(url_label_pairs):
         print(f"\n[SCRAPING] {label}")
         items = await scrape_video_urls(url, label)
+        # Forcer le nom de marque connu (source fiable) — l'extraction DOM/API
+        # peut renvoyer du texte d'interface parasite ("Ouvrir la liste déroulante", etc.)
+        brand_name = page_names_override[i] if i < len(page_names_override) else None
+        if brand_name:
+            for item in items:
+                item["page_name"] = brand_name
+        # Limiter aux N meilleures pubs par marque (reach EU si dispo, sinon position)
+        found_count = len(items)
+        items = sorted(items, key=lambda it: it.get("eu_reach") or 0, reverse=True)[:max_per_brand]
         all_video_items.extend(items)
-        print(f"  → {len(items)} vidéo(s) trouvée(s) pour « {label} »")
+        print(f"  → {found_count} vidéo(s) trouvée(s), {len(items)} retenue(s) pour « {label} »")
 
     if not all_video_items:
         print("\n⚠ Aucune vidéo trouvée.")
@@ -849,8 +870,10 @@ async def main(url_label_pairs: list[tuple[str, str]]):
     for i, item in enumerate(all_video_items, 1):
         print(f"  ── {item['label']} #{item['position']} ({i}/{len(all_video_items)}) ──")
         safe_label = item["label"].replace(" ", "_").lower()
-        video_path = OUTPUT_DIR / f"{safe_label}_{item['position']:02d}.mp4"
-        transcript_path = OUTPUT_DIR / f"{safe_label}_{item['position']:02d}.txt"
+        safe_brand = re.sub(r"[^a-z0-9]+", "_", (item.get("page_name") or "unknown").lower()).strip("_") or "unknown"
+        file_key = f"{safe_brand}_{safe_label}_{item['position']:02d}"
+        video_path = OUTPUT_DIR / f"{file_key}.mp4"
+        transcript_path = OUTPUT_DIR / f"{file_key}.txt"
 
         if transcript_path.exists():
             print(f"    ↩ Déjà transcrit, ignoré.")
@@ -965,6 +988,14 @@ async def main(url_label_pairs: list[tuple[str, str]]):
             entry["performance"] = compute_performance_score(entry, results)
 
         json_path = OUTPUT_DIR / "all_transcriptions.json"
+        # Fusion avec l'existant (clé marque+label+position) pour ne pas écraser les runs précédents
+        _k = lambda e: (e.get("page_name"), e.get("label"), e.get("position"))
+        try:
+            previous = json.loads(json_path.read_text(encoding="utf-8"))
+        except Exception:
+            previous = []
+        new_keys = {_k(e) for e in results}
+        results = [e for e in previous if _k(e) not in new_keys] + results
         json_path.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
         html_path = OUTPUT_DIR / "rapport.html"
         generate_html_report(results, html_path)
@@ -988,6 +1019,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", action="append", dest="urls", metavar="URL")
     parser.add_argument("--label", action="append", dest="labels", metavar="LABEL")
+    parser.add_argument("--page-name", action="append", dest="page_names", metavar="PAGE_NAME")
     return parser.parse_args()
 
 
@@ -1001,6 +1033,10 @@ if __name__ == "__main__":
     while len(labels) < len(args.urls):
         labels.append(f"Catégorie {len(labels)+1}")
 
+    page_names = args.page_names or []
+    while len(page_names) < len(args.urls):
+        page_names.append(None)
+
     # Paramètres overridables depuis Streamlit
     if os.environ.get("WHISPER_MODEL_OVERRIDE"):
         WHISPER_MODEL = os.environ["WHISPER_MODEL_OVERRIDE"]
@@ -1010,4 +1046,4 @@ if __name__ == "__main__":
         except ValueError:
             pass
 
-    asyncio.run(main(list(zip(args.urls, labels))))
+    asyncio.run(main(list(zip(args.urls, labels)), page_names_override=page_names))

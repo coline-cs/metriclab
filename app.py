@@ -23,7 +23,7 @@ except ImportError:
 BASE_DIR = Path(__file__).parent
 OUTPUT_DIR = BASE_DIR / "transcriptions"
 GENERATED_DIR = BASE_DIR / "generated_copy"
-PYTHON = str(BASE_DIR / ".venv" / "bin" / "python")
+PYTHON = str(BASE_DIR / ".venv" / "bin" / "python") if (BASE_DIR / ".venv" / "bin" / "python").exists() else sys.executable
 
 OUTPUT_DIR.mkdir(exist_ok=True)
 GENERATED_DIR.mkdir(exist_ok=True)
@@ -653,6 +653,7 @@ TAB_NAMES = [
     "💬 Chat",
     "🔍 Scraper",
     "📊 Rapport",
+    "📋 Toutes les pubs",
     "⚡ Script Rapide",
     "🔬 Intelligence",
     "✍️ Générer du Copy",
@@ -716,8 +717,11 @@ if _nav == "🏢 Marques":
             _env["SCROLL_COUNT_OVERRIDE"] = str(scroll_count)
             _log_slot = st.empty()
             _logs = []
+            _scrape_cmd = [PYTHON, "transcriber.py", "--url", _pending["url"], "--label", _pending["label"]]
+            if _pending.get("name"):
+                _scrape_cmd += ["--page-name", _pending["name"]]
             _proc = subprocess.Popen(
-                [PYTHON, "transcriber.py", "--url", _pending["url"], "--label", _pending["label"]],
+                _scrape_cmd,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True, cwd=str(BASE_DIR), env=_env,
             )
@@ -773,8 +777,11 @@ if _nav == "🏢 Marques":
                 _env = os.environ.copy()
                 _env["WHISPER_MODEL_OVERRIDE"] = whisper_model
                 _env["SCROLL_COUNT_OVERRIDE"] = str(scroll_count)
+                _batch_cmd = [PYTHON, "transcriber.py", "--url", _b["url"], "--label", _b["label"]]
+                if _b.get("name"):
+                    _batch_cmd += ["--page-name", _b["name"]]
                 _proc2 = subprocess.Popen(
-                    [PYTHON, "transcriber.py", "--url", _b["url"], "--label", _b["label"]],
+                    _batch_cmd,
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                     text=True, cwd=str(BASE_DIR), env=_env,
                 )
@@ -1031,12 +1038,28 @@ if _nav == "📊 Rapport":
 
     html_path = OUTPUT_DIR / "rapport.html"
 
-    # ── Toggle vue ──────────────────────────────
-    _view_mode = st.radio(
-        "Vue", ["📋 Pubs décortiquées", "📄 Rapport HTML"],
-        horizontal=True, label_visibility="collapsed",
-        key="rapport_view_mode"
-    )
+    # ── Toggle vue + bouton export Claude ───────
+    _toggle_col, _export_col = st.columns([4, 1])
+    with _toggle_col:
+        _view_mode = st.radio(
+            "Vue", ["📋 Pubs décortiquées", "📄 Rapport HTML"],
+            horizontal=True, label_visibility="collapsed",
+            key="rapport_view_mode"
+        )
+    with _export_col:
+        _export_path = OUTPUT_DIR / "rapport_complet_claude.txt"
+        if _export_path.exists():
+            st.download_button(
+                "⬇️ Export Claude",
+                data=_export_path.read_text(encoding="utf-8"),
+                file_name="metriclab_rapport.txt",
+                mime="text/plain",
+                help="Télécharge un rapport complet à coller dans Claude pour analyse des patterns",
+                use_container_width=True,
+            )
+        else:
+            if st.button("📄 Générer export", use_container_width=True):
+                st.rerun()
 
     # ── Vue pubs décortiquées ───────────────────
     if _view_mode == "📋 Pubs décortiquées":
@@ -1489,6 +1512,125 @@ Réponds UNIQUEMENT en JSON valide avec ces clés :
                 st.success("✅ Continue la conversation dans l'onglet **Agent Expert**.")
             else:
                 st.error("Module agent non disponible — vérifie que agent.py est présent.")
+
+
+# ══════════════════════════════════════════════
+# ONGLET — TOUTES LES PUBS
+# ══════════════════════════════════════════════
+if _nav == "📋 Toutes les pubs":
+    st.markdown("### 📋 Toutes les pubs scrapées")
+    st.caption("Vue complète de toutes les transcriptions avec marque, couverture et date — prête à exporter pour analyse.")
+
+    if not transcriptions:
+        st.info("Aucune transcription disponible. Lance d'abord un scraping depuis l'onglet Marques.")
+    else:
+        # ── Métriques rapides ──────────────────────────────────────
+        _tp1, _tp2, _tp3, _tp4 = st.columns(4)
+        _with_brand  = [r for r in transcriptions if r.get("page_name")]
+        _with_reach  = [r for r in transcriptions if r.get("eu_reach")]
+        _with_date   = [r for r in transcriptions if r.get("start_date")]
+        _tp1.metric("Total pubs", len(transcriptions))
+        _tp2.metric("Avec nom marque", len(_with_brand))
+        _tp3.metric("Avec reach EU", len(_with_reach))
+        _tp4.metric("Avec date", len(_with_date))
+
+        st.markdown("---")
+
+        # ── Filtres ────────────────────────────────────────────────
+        _tf1, _tf2, _tf3 = st.columns([3, 2, 2])
+        _t_search = _tf1.text_input("Rechercher", placeholder="mot-clé dans le transcript...", label_visibility="collapsed")
+        _brands_list = sorted(set(r.get("page_name") or "Sans nom" for r in transcriptions))
+        _t_brand = _tf2.selectbox("Marque", ["Toutes"] + _brands_list, label_visibility="collapsed")
+        _t_sort  = _tf3.selectbox("Trier par", ["Date scraping", "Reach EU", "Score"], label_visibility="collapsed")
+
+        _filtered = transcriptions[:]
+        if _t_search:
+            _filtered = [r for r in _filtered if _t_search.lower() in (r.get("transcript") or "").lower()]
+        if _t_brand != "Toutes":
+            _filtered = [r for r in _filtered if (r.get("page_name") or "Sans nom") == _t_brand]
+        if _t_sort == "Reach EU":
+            _filtered = sorted(_filtered, key=lambda r: r.get("eu_reach") or 0, reverse=True)
+        elif _t_sort == "Score":
+            _filtered = sorted(_filtered, key=lambda r: (r.get("scoring") or {}).get("score_total") or 0, reverse=True)
+
+        st.caption(f"{len(_filtered)} pub(s) affichée(s)")
+
+        # ── Tableau ────────────────────────────────────────────────
+        def _fmt_r(v):
+            if not v: return "—"
+            v = int(v)
+            if v >= 1_000_000: return f"{v/1_000_000:.1f}M"
+            if v >= 1_000: return f"{v//1_000}k"
+            return str(v)
+
+        _fmt_labels = {
+            "ugc": "🙋 UGC", "founder": "🎙 Founder", "trottoir": "🚶 Trottoir",
+            "explicatif": "📊 Explicatif", "ai_video": "🤖 IA", "animated": "🎨 Animé",
+            "demo": "🧴 Démo", "talking_head": "🎤 Expert", "pov": "🐾 POV",
+        }
+
+        for _r in _filtered:
+            _brand   = _r.get("page_name") or "—"
+            _reach   = _fmt_r(_r.get("eu_reach"))
+            _date    = (_r.get("start_date") or "")[:10] or "—"
+            _fmt     = _fmt_labels.get(_r.get("ad_format", ""), _r.get("ad_format", "—"))
+            _score   = (_r.get("scoring") or {}).get("score_total")
+            _score_s = f"{_score}/10" if _score else "—"
+            _hook    = (_r.get("hook_3s") or _r.get("transcript") or "")[:90].strip()
+            _trans   = (_r.get("transcript") or "").strip()
+            _ad_id   = _r.get("ad_id") or ""
+            _lib_url = f"https://www.facebook.com/ads/library/?id={_ad_id}" if _ad_id else None
+
+            st.markdown(f"""<div style="border:1px solid #2a2a2a;border-radius:12px;padding:14px 18px;margin-bottom:8px;background:#111">
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+    <span style="font-weight:800;font-size:14px;color:#fff">{_brand}</span>
+    <span style="background:#1e3a5f;color:#6ba3d6;border-radius:8px;padding:2px 10px;font-size:11px">📡 {_reach}</span>
+    <span style="background:#1a3a1a;color:#6dbf6d;border-radius:8px;padding:2px 10px;font-size:11px">📅 {_date}</span>
+    <span style="background:#2a2a2a;color:#aaa;border-radius:8px;padding:2px 10px;font-size:11px">{_fmt}</span>
+    <span style="background:#2a1a3a;color:#b06dd6;border-radius:8px;padding:2px 10px;font-size:11px">⭐ {_score_s}</span>
+    {"<a href='" + _lib_url + "' target='_blank' style='font-size:11px;color:#555;text-decoration:none'>🔗 Voir</a>" if _lib_url else ""}
+  </div>
+  <div style="font-size:13px;font-weight:600;color:#ddd;border-left:3px solid #444;padding-left:10px;margin-bottom:6px">🎣 {_hook}{"..." if len(_hook) >= 90 else ""}</div>
+</div>""", unsafe_allow_html=True)
+
+            with st.expander("📄 Transcription complète"):
+                st.text(_trans)
+
+        st.markdown("---")
+
+        # ── Export pour Claude ──────────────────────────────────────
+        st.markdown("#### ⬇️ Export pour analyse Claude")
+        st.caption("Télécharge toutes les transcriptions en texte structuré — colle-le dans Claude pour analyser les patterns.")
+
+        _lines = []
+        _lines.append("METRICLAB — EXPORT COMPLET DES PUBS SCRAPÉES")
+        _lines.append(f"Total : {len(transcriptions)} pubs | Export : {__import__('datetime').date.today()}")
+        _lines.append("=" * 60)
+        _lines.append("")
+
+        for _i, _r in enumerate(sorted(transcriptions, key=lambda r: r.get("eu_reach") or 0, reverse=True), 1):
+            _lines.append(f"── PUB #{_i} ──────────────────────────────────────")
+            _lines.append(f"MARQUE      : {_r.get('page_name') or '?'}")
+            _lines.append(f"REACH EU    : {_fmt_r(_r.get('eu_reach'))}")
+            _lines.append(f"DATE        : {(_r.get('start_date') or '')[:10] or '?'}")
+            _lines.append(f"FORMAT      : {_r.get('ad_format') or '?'}")
+            _lines.append(f"SCORE       : {(_r.get('scoring') or {}).get('score_total') or '?'}/10")
+            _lines.append(f"HOOK 0-3s   : {(_r.get('hook_3s') or '').strip()}")
+            _lines.append(f"TRANSCRIPT  :")
+            for _tl in (_r.get('transcript') or '').strip().split('\n'):
+                _lines.append(f"  {_tl}")
+            _lines.append("")
+
+        _export_text = "\n".join(_lines)
+
+        st.download_button(
+            "⬇️ Télécharger l'export complet (.txt)",
+            data=_export_text,
+            file_name="metriclab_toutes_pubs.txt",
+            mime="text/plain",
+            type="primary",
+            use_container_width=True,
+        )
 
 
 # ══════════════════════════════════════════════
